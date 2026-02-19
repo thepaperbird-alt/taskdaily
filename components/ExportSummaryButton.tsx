@@ -28,7 +28,7 @@ export default function ExportSummaryButton({ week }: { week?: string }) {
     return (
         <button
             onClick={handleExport}
-            className="btn bg-neutral-100 text-sm hover:bg-neutral-200 flex items-center gap-2"
+            className="btn bg-neutral-800 text-neutral-200 text-sm hover:bg-neutral-700 flex items-center gap-2"
         >
             <Download size={16} /> Export
         </button>

@@ -45,10 +45,10 @@ export default function HashtagManager({ tags }: { tags: any[] }) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
-            <div className="px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 flex justify-between items-center">
-                <h2 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
-                    <Hash size={14} className="text-neutral-400" />
+        <div className="flex flex-col h-full bg-neutral-900/30 rounded-xl shadow-sm border border-neutral-800 overflow-hidden">
+            <div className="px-4 py-3 border-b border-neutral-800 bg-neutral-900/50 flex justify-between items-center">
+                <h2 className="text-sm font-semibold text-neutral-200 flex items-center gap-2">
+                    <Hash size={14} className="text-neutral-500" />
                     Hashtags
                 </h2>
                 <span className="text-xs text-neutral-400">{tags.length} tags</span>
@@ -65,7 +65,7 @@ export default function HashtagManager({ tags }: { tags: any[] }) {
                                 <div
                                     key={tag.id}
                                     onClick={() => handleTagClick(tag.name)}
-                                    className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all cursor-pointer border border-transparent hover:brightness-95"
+                                    className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all cursor-pointer border border-transparent hover:brightness-110"
                                     style={{
                                         backgroundColor: stringToBgColor(tag.name),
                                         color: stringToColor(tag.name)

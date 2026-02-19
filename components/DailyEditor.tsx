@@ -127,12 +127,16 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
 
     // 6th Word Color Logic
     const techColors = [
-        'text-cyan-600 dark:text-cyan-400',
-        'text-green-600 dark:text-green-400',
-        'text-purple-600 dark:text-purple-400',
-        'text-yellow-600 dark:text-yellow-400',
-        'text-pink-600 dark:text-pink-400',
-        'text-blue-600 dark:text-blue-400'
+        'text-cyan-400',
+        'text-green-400',
+        'text-purple-400',
+        'text-yellow-400',
+        'text-pink-400',
+        'text-blue-400',
+        'text-red-400',
+        'text-orange-400',
+        'text-indigo-400',
+        'text-teal-400'
     ];
 
     let wordCount = 0;
@@ -141,7 +145,13 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         if (part.trim().length > 0) {
             wordCount++;
             if (wordCount % 6 === 0) {
-                const colorClass = techColors[wordCount % techColors.length];
+                // Determine color based on word hash to keep it stable but random-looking
+                let hash = 0;
+                for (let i = 0; i < part.length; i++) {
+                    hash = part.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                const colorIndex = Math.abs(hash) % techColors.length;
+                const colorClass = techColors[colorIndex];
                 return <span key={index} className={colorClass}>{part}</span>;
             }
         }
@@ -157,9 +167,9 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+        <div className="flex flex-col h-full bg-black rounded-xl shadow-sm border border-neutral-800 overflow-hidden">
             {/* Header / Toolbar */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-neutral-900/50">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center bg-white dark:bg-neutral-800 rounded-lg p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-sm">
                         <Link href={`/?date=${prevDay}`} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors">
@@ -195,7 +205,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     {/* Overlay for coloring */}
                     <div
                         id="editor-overlay"
-                        className="absolute inset-0 p-6 whitespace-pre-wrap font-mono text-base leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
+                        className="absolute inset-0 p-6 whitespace-pre-wrap font-mono text-base leading-relaxed text-white pointer-events-none overflow-hidden"
                         aria-hidden="true"
                     >
                         {overlayContent}
@@ -210,8 +220,8 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                         onSelect={handleContentSelect}
                         onScroll={handleScroll}
                         placeholder="Start typing..."
-                        className="w-full h-full p-6 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none relative z-10"
-                        style={{ color: 'transparent', caretColor: 'var(--foreground)' }}
+                        className="w-full h-full p-6 bg-transparent text-base leading-relaxed font-mono text-white placeholder:text-neutral-700 resize-none focus:outline-none relative z-10"
+                        style={{ color: 'transparent', caretColor: 'white' }}
                     />
                     <HashtagDropdown
                         isOpen={showContentDropdown}

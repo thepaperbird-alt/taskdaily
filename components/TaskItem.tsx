@@ -40,7 +40,7 @@ export default function TaskItem({ task }: { task: Task }) {
     if (isDeleting) return null;
 
     return (
-        <div className="flex items-center gap-3 p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg group shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700">
+        <div className="flex items-center gap-3 p-3 bg-neutral-900/50 border border-neutral-800 rounded-lg group shadow-sm transition-all hover:border-neutral-700">
             <button
                 onClick={handleToggle}
                 className={cn(
