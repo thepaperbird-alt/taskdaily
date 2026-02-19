@@ -121,11 +121,11 @@ export default function TagSelector({
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-black border border-neutral-800 shadow-lg rounded-lg z-50 p-2 text-sm">
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-lg rounded-lg z-50 p-2 text-sm">
                     <input
                         type="text"
                         placeholder="Search or create..."
-                        className="w-full bg-neutral-900 border border-neutral-800 rounded px-2 py-1 mb-2 focus:outline-none text-xs"
+                        className="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded px-2 py-1 mb-2 focus:outline-none text-xs"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         autoFocus
