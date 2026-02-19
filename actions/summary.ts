@@ -144,13 +144,57 @@ export async function generateWeeklySummary(date: Date) {
         return summaryText;
     } catch (error: any) {
         console.error("OpenAI Error Full Object:", JSON.stringify(error, null, 2));
+
+        // Fallback for Quota Exceeded (429) or Billing Issues
+        if (error.code === 'insufficient_quota' || error.status === 429 || error.type === 'insufficient_quota') {
+            console.warn("OpenAI Quota Exceeded. Returning mock summary.");
+            const mockSummary = `# Weekly Reflection (Mock)
+            
+**Note:** valid OpenAI credits are required for real AI generation. This is a placeholder.
+
+This week has been productive! You've managed to maintain a steady flow of tasks, focusing largely on development and testing.
+
+### Highlights
+- consistently updated daily logs.
+- maintained a high task completion rate.
+- effectively used the tagging system.
+
+**Productivity Score:** 85/100
+**Theme:** Foundation Building`;
+
+            // We can return this mock directly without saving to DB to avoid polluting it, 
+            // OR save it so the UI state persists. Let's save it for a smooth UX.
+
+            // Store in DB (Duplicate logic, could refactor but keeping simple for now)
+            const { data: existing } = await supabase
+                .from('td_weekly_summaries')
+                .select('id')
+                .eq('week_start', weekStartStr)
+                .single();
+
+            if (existing) {
+                await supabase.from('td_weekly_summaries').update({
+                    summary_text: mockSummary,
+                    generated_at: new Date().toISOString()
+                }).eq('id', existing.id);
+            } else {
+                await supabase.from('td_weekly_summaries').insert({
+                    week_start: weekStartStr,
+                    summary_text: mockSummary,
+                    user_id: user.id
+                });
+            }
+            revalidatePath('/');
+            return mockSummary;
+        }
+
         console.log("Debug Info:", {
             hasKey: !!process.env.OPENAI_API_KEY,
             keyLength: process.env.OPENAI_API_KEY?.length,
             model: "gpt-4o"
         });
 
-        // Return the actual error message to the client
+        // Return the actual error message to the client for other errors
         throw new Error(error.message || "Failed to generate AI summary.");
     }
 }
