@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Plus, List, ListOrdered, CheckSquare, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, List, ListOrdered, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, isToday, addDays, subDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { createOrUpdateDaily, addDailyTask } from '@/actions/dailies';
@@ -46,11 +46,12 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
 
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Update local state when prop changes
+    // Update local state when prop changes - ONLY if date changes
+    // This fixes the "auto-delete" bug caused by revalidation race conditions
     useEffect(() => {
         setContent(daily?.content || '');
         setTasks(daily?.tasks || []);
-    }, [daily]);
+    }, [daily?.entry_date]); // Only update content if we switch days
 
     const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         handleContentChangeWrapper(e);
@@ -103,8 +104,6 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
 
         const newText = before + prefix + after;
 
-        // Update state and fire change event simulation if needed for storage?
-        // Simpler to just update state and call save function manually
         setContent(newText);
 
         // Focus back and set cursor
@@ -125,6 +124,37 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     const formattedDate = format(date, 'EEEE, MMMM do, yyyy');
     const prevDay = format(subDays(date, 1), 'yyyy-MM-dd');
     const nextDay = format(addDays(date, 1), 'yyyy-MM-dd');
+
+    // 6th Word Color Logic
+    const techColors = [
+        'text-cyan-600 dark:text-cyan-400',
+        'text-green-600 dark:text-green-400',
+        'text-purple-600 dark:text-purple-400',
+        'text-yellow-600 dark:text-yellow-400',
+        'text-pink-600 dark:text-pink-400',
+        'text-blue-600 dark:text-blue-400'
+    ];
+
+    let wordCount = 0;
+    const overlayContent = content.split(/(\s+)/).map((part, index) => {
+        // Simple logic: if it's not purely whitespace, count it as a word
+        if (part.trim().length > 0) {
+            wordCount++;
+            if (wordCount % 6 === 0) {
+                const colorClass = techColors[wordCount % techColors.length];
+                return <span key={index} className={colorClass}>{part}</span>;
+            }
+        }
+        return <span key={index}>{part}</span>;
+    });
+
+    const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
+        const overlay = document.getElementById('editor-overlay');
+        if (overlay) {
+            overlay.scrollTop = e.currentTarget.scrollTop;
+            overlay.scrollLeft = e.currentTarget.scrollLeft;
+        }
+    };
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
@@ -160,16 +190,28 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col relative overflow-hidden">
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
+            <div className="flex-1 flex flex-col relative overflow-hidden bg-neutral-50/20">
+                <div className="flex-1 relative overflow-hidden">
+                    {/* Overlay for coloring */}
+                    <div
+                        id="editor-overlay"
+                        className="absolute inset-0 p-6 whitespace-pre-wrap font-mono text-base leading-relaxed text-transparent pointer-events-none overflow-hidden"
+                        aria-hidden="true"
+                    >
+                        {overlayContent}
+                    </div>
+
+                    {/* Actual Editor */}
                     <textarea
                         ref={textareaRef}
                         value={content}
                         onChange={handleContentChange}
                         onKeyDown={onContentKeyDown}
                         onSelect={handleContentSelect}
-                        placeholder="Start typing your daily notes here..."
-                        className="w-full h-full bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none"
+                        onScroll={handleScroll}
+                        placeholder="Start typing..."
+                        className="w-full h-full p-6 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none relative z-10"
+                        style={{ color: 'transparent', caretColor: 'var(--foreground)' }}
                     />
                     <HashtagDropdown
                         isOpen={showContentDropdown}
@@ -184,26 +226,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     />
                 </div>
 
-                {/* Inline Tasks Section - Fixed at bottom or scrollable? User said "Tasks panel can display every task". 
-                   But also "inline tasks". If I move tasks to the main Task Column completely, maybe I don't need them here?
-                   "Tasks panel can display every task from all the days in that space." -> This implies the main Task Column.
-                   But user strictly said "Tasks panel can display every task...".
-                   Wait, "The dailies section... show only the editor... Tasks panel can display every task".
-                   
-                   Does this mean I should REMOVE tasks from the Daily Editor?
-                   "Implement inline task creation and sync" was a prior feature.
-                   If I remove it, I might break that workflow.
-                   However, user says "Tasks panel can display every task".
-                   Maybe they mean the *Task Column* on the left? Yes.
-                   
-                   But often people want to add tasks *while* journaling.
-                   I will keep the "Add Task" button but maybe make the list less prominent or integrated?
-                   Actually, the user didn't explicitly say "remove inline tasks from daily view".
-                   They said "Tasks panel can display every task from all the days".
-                   
-                   I will keep the "Add Task" feature in the daily editor because it's powerful (contextual tasks).
-                   But I'll make it cleaner.
-                */}
+                {/* Inline Tasks Section */}
                 <div className="border-t border-neutral-100 dark:border-neutral-800 p-4 bg-neutral-50/30 dark:bg-neutral-900/30">
                     <div className="mb-2 flex items-center justify-between">
                         <span className="text-xs font-medium text-neutral-500 uppercase tracking-widest">Linked Tasks</span>

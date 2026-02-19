@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { X, Hash, Search, Filter } from 'lucide-react';
 import { deleteTag, getParagraphsByTag } from '@/actions/tag-manager';
 import { format } from 'date-fns';
+import { stringToColor, stringToBgColor } from '@/lib/utils'; // Import utils
 
 export default function HashtagManager({ tags }: { tags: any[] }) {
+    // ... (state remains)
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -63,12 +65,17 @@ export default function HashtagManager({ tags }: { tags: any[] }) {
                                 <div
                                     key={tag.id}
                                     onClick={() => handleTagClick(tag.name)}
-                                    className="group flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-full text-xs text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer border border-transparent hover:border-neutral-300 dark:hover:border-neutral-600"
+                                    className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs transition-all cursor-pointer border border-transparent hover:brightness-95"
+                                    style={{
+                                        backgroundColor: stringToBgColor(tag.name),
+                                        color: stringToColor(tag.name)
+                                    }}
                                 >
                                     <span className="font-medium">#{tag.name}</span>
                                     <button
                                         onClick={(e) => handleDelete(tag.id, e)}
-                                        className={`ml-1 p-0.5 rounded-full hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors ${confirmDelete === tag.id ? 'text-red-500 bg-red-100 dark:bg-red-900/30' : 'text-neutral-400 opacity-0 group-hover:opacity-100'}`}
+                                        className={`ml-1 p-0.5 rounded-full hover:bg-black/10 transition-colors ${confirmDelete === tag.id ? 'text-red-600 bg-red-100' : 'opacity-0 group-hover:opacity-100'}`}
+                                        style={{ color: confirmDelete === tag.id ? undefined : stringToColor(tag.name) }}
                                         title={confirmDelete === tag.id ? "Click again to delete" : "Delete tag"}
                                     >
                                         <X size={10} />

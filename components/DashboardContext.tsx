@@ -10,7 +10,7 @@ type DashboardContextType = {
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
+    const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
 
     const toggleSummary = () => setIsSummaryCollapsed(prev => !prev);
 

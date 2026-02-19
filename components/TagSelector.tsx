@@ -4,11 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import { Tag as TagIcon, X, Plus, Check } from 'lucide-react';
 import { Tag } from '@/lib/types';
 import { createTag, assignTagToTask, removeTagFromTask } from '@/actions/tags';
-import { cn } from '@/lib/utils';
-import { getTags } from '@/actions/tags'; // Wait, client component can't call server action directly for fetching in useEffect easily without wrapping.
-// We'll pass `availableTags` as prop or use a server action wrapper that returns data.
+import { cn, stringToColor, stringToBgColor } from '@/lib/utils';
+import { getTags } from '@/actions/tags';
 
-// For MVP, simplistic approach: fetch tags on open.
+// ... imports remain same ...
 
 export default function TagSelector({
     taskId,
@@ -27,7 +26,7 @@ export default function TagSelector({
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Close when clicking outside
+    // ... useEffect remains same ...
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -41,7 +40,6 @@ export default function TagSelector({
     const fetchTags = async () => {
         setLoading(true);
         try {
-            // This is a server action, we can call it.
             const tags = await getTags();
             setAvailableTags(tags);
         } catch (e) {
@@ -99,9 +97,16 @@ export default function TagSelector({
             {/* Render Assigned Tags */}
             <div className="flex flex-wrap gap-1 items-center">
                 {assignedTags.map(tag => (
-                    <div key={tag.id} className="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1 border border-neutral-200 dark:border-neutral-700">
+                    <div
+                        key={tag.id}
+                        className="text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1 border border-transparent"
+                        style={{
+                            backgroundColor: stringToBgColor(tag.name),
+                            color: stringToColor(tag.name)
+                        }}
+                    >
                         {tag.name}
-                        <button onClick={() => handleSelectTag(tag)} className="hover:text-red-500">
+                        <button onClick={() => handleSelectTag(tag)} className="hover:opacity-70">
                             <X size={10} />
                         </button>
                     </div>
@@ -137,7 +142,15 @@ export default function TagSelector({
                                     onClick={() => handleSelectTag(tag)}
                                     className="w-full text-left px-2 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded flex justify-between items-center text-xs"
                                 >
-                                    <span className="truncate">{tag.name}</span>
+                                    <span
+                                        className="truncate px-1.5 py-0.5 rounded-full"
+                                        style={{
+                                            backgroundColor: stringToBgColor(tag.name),
+                                            color: stringToColor(tag.name)
+                                        }}
+                                    >
+                                        {tag.name}
+                                    </span>
                                     {isAssigned && <Check size={12} className="text-neutral-900 dark:text-white" />}
                                 </button>
                             );
