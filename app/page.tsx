@@ -5,16 +5,21 @@ import SummaryColumn from '@/components/SummaryColumn';
 import MobileNav from '@/components/MobileNav';
 import ExportSummaryButton from '@/components/ExportSummaryButton';
 import DashboardLayout from '@/components/DashboardLayout';
+import HashtagManager from '@/components/HashtagManager';
+import { getTags } from '@/actions/tags';
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; week?: string; tags?: string }>;
+  searchParams: Promise<{ tab?: string; week?: string; tags?: string; date?: string }>; // Added date param
 }) {
   const resolvedParams = await searchParams;
   const tab = resolvedParams.tab || 'tasks';
   const week = resolvedParams.week;
-  const tags = resolvedParams.tags ? resolvedParams.tags.split(',') : undefined;
+  const dateStr = resolvedParams.date; // Support date param for Dailies
+  const tagsFilter = resolvedParams.tags ? resolvedParams.tags.split(',') : undefined;
+
+  const allTags = await getTags();
 
   return (
     <main className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
@@ -47,19 +52,27 @@ export default async function Page({
 
       {/* Content */}
       <div className="flex-1 overflow-hidden relative">
-        {/* Desktop Grid */}
         {/* Desktop Grid via DashboardLayout */}
         <DashboardLayout
-          tasks={<TaskList filterTags={tags} />}
-          dailies={<DailyColumn dateStr={week} filterTags={tags} />}
-          summary={<SummaryColumn dateStr={week} filterTags={tags} />}
+          tasks={
+            <div className="flex flex-col h-full gap-4">
+              <div className="flex-1 overflow-hidden">
+                <TaskList filterTags={tagsFilter} />
+              </div>
+              <div className="h-[35%] shrink-0 overflow-hidden">
+                <HashtagManager tags={allTags} />
+              </div>
+            </div>
+          }
+          dailies={<DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
+          summary={<SummaryColumn dateStr={week} filterTags={tagsFilter} />}
         />
 
         {/* Mobile View */}
         <div className="md:hidden h-full pb-20 p-4 overflow-y-auto">
-          {tab === 'tasks' && <TaskList filterTags={tags} />}
-          {tab === 'dailies' && <DailyColumn dateStr={week} filterTags={tags} />}
-          {tab === 'summary' && <SummaryColumn dateStr={week} filterTags={tags} />}
+          {tab === 'tasks' && <TaskList filterTags={tagsFilter} />}
+          {tab === 'dailies' && <DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
+          {tab === 'summary' && <SummaryColumn dateStr={week} filterTags={tagsFilter} />}
         </div>
       </div>
 

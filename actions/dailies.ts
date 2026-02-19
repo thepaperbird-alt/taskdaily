@@ -64,6 +64,34 @@ export async function getDailiesForWeek(date: Date, filterTags: string[] = []) {
     return dailies as Daily[];
 }
 
+export async function getDaily(date: Date) {
+    const supabase = await createClient();
+    const dateStr = format(date, 'yyyy-MM-dd');
+
+    const { data, error } = await supabase
+        .from('td_dailies')
+        .select(`
+      *,
+      tasks:td_tasks (*),
+      td_daily_tags (
+        tag:td_tags (*)
+      )
+    `)
+        .eq('entry_date', dateStr)
+        .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "Relation null" (no rows), which is fine
+        console.error('Error fetching daily:', error);
+    }
+
+    if (!data) return null;
+
+    return {
+        ...data,
+        tags: data.td_daily_tags.map((dt: any) => dt.tag)
+    } as Daily;
+}
+
 export async function createOrUpdateDaily(date: string, content: string, id?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

@@ -3,7 +3,6 @@
 import { ChevronRight, PanelRightClose, PanelRightOpen, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import TagFilterBar from './TagFilterBar';
-import SummaryAI from './SummaryAI';
 import { useDashboard } from './DashboardContext';
 
 export default function SummaryColumnClient({ metrics, tags, summaryData, currentDate }: any) {
@@ -82,7 +81,7 @@ export default function SummaryColumnClient({ metrics, tags, summaryData, curren
                     </div>
                 </div>
 
-                <SummaryAI date={currentDate} initialSummary={summaryData?.summary_text} />
+                {/* AI Summary removed as per user request */}
             </div>
         </div>
     );
