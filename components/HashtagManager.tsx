@@ -45,8 +45,8 @@ export default function HashtagManager({ tags }: { tags: any[] }) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-neutral-900/30 rounded-xl shadow-sm border border-neutral-800 overflow-hidden">
-            <div className="px-4 py-3 border-b border-neutral-800 bg-neutral-900/50 flex justify-between items-center">
+        <div className="flex flex-col h-full bg-black rounded-xl shadow-sm border border-neutral-800 overflow-hidden">
+            <div className="px-4 py-3 border-b border-neutral-800 bg-black flex justify-between items-center">
                 <h2 className="text-sm font-semibold text-neutral-200 flex items-center gap-2">
                     <Hash size={14} className="text-neutral-500" />
                     Hashtags
@@ -86,7 +86,7 @@ export default function HashtagManager({ tags }: { tags: any[] }) {
                     </div>
                 ) : (
                     <div className="flex-1 flex flex-col overflow-hidden">
-                        <div className="px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center shrink-0">
+                        <div className="px-3 py-2 bg-black border-b border-neutral-800 flex justify-between items-center shrink-0">
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
                                     #{selectedTag}

@@ -22,9 +22,9 @@ export default async function Page({
   const allTags = await getTags();
 
   return (
-    <main className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
+    <main className="h-screen flex flex-col bg-black overflow-hidden">
       {/* Header */}
-      <header className="h-14 px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between shrink-0">
+      <header className="h-14 px-4 border-b border-neutral-800 bg-black flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <div className="bg-neutral-900 text-white p-1 rounded-md">
             <svg

@@ -29,7 +29,7 @@ export default function SummaryColumnClient({ metrics, tags, summaryData, curren
         <div className="h-full flex flex-col transition-all duration-300 relative group w-full">
             <button
                 onClick={toggleSummary}
-                className="absolute -left-3 top-4 p-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full text-neutral-400 hover:text-neutral-600 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                className="absolute -left-3 top-4 p-1 bg-black border border-neutral-800 rounded-full text-neutral-400 hover:text-neutral-200 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 title="Collapse Summary"
             >
                 <ChevronsRight size={14} />

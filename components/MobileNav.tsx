@@ -10,7 +10,7 @@ export default function MobileNav({ activeTab }: { activeTab: string }) {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 md:hidden z-50 pb-safe">
+        <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-neutral-800 md:hidden z-50 pb-safe">
             <div className="flex justify-around items-center h-16">
                 {navItems.map((item) => {
                     const Icon = item.icon;
