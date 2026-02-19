@@ -142,8 +142,15 @@ export async function generateWeeklySummary(date: Date) {
 
         revalidatePath('/');
         return summaryText;
-    } catch (error) {
-        console.error("OpenAI Error:", error);
-        throw new Error("Failed to generate AI summary.");
+    } catch (error: any) {
+        console.error("OpenAI Error Full Object:", JSON.stringify(error, null, 2));
+        console.log("Debug Info:", {
+            hasKey: !!process.env.OPENAI_API_KEY,
+            keyLength: process.env.OPENAI_API_KEY?.length,
+            model: "gpt-4o"
+        });
+
+        // Return the actual error message to the client
+        throw new Error(error.message || "Failed to generate AI summary.");
     }
 }

@@ -20,9 +20,9 @@ export default function SummaryAI({
         try {
             const newSummary = await generateWeeklySummary(date);
             setSummary(newSummary);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            alert("Failed to generate summary. Please check OpenAI key.");
+            alert(`Failed to generate summary: ${e.message}`);
         } finally {
             setLoading(false);
         }
