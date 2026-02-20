@@ -201,8 +201,8 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col relative overflow-hidden bg-neutral-50/20">
-                <div className="flex-1 relative overflow-hidden">
+            <div className="flex-1 flex flex-col relative overflow-hidden bg-neutral-50/20 min-h-0">
+                <div className="flex-1 relative overflow-hidden min-h-0">
                     {/* Overlay for coloring */}
                     <div
                         id="editor-overlay"
@@ -221,7 +221,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                         onSelect={handleContentSelect}
                         onScroll={handleScroll}
                         placeholder="Start typing..."
-                        className="w-full h-full p-6 pb-64 md:pb-12 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none relative z-10"
+                        className="absolute inset-0 w-full h-full p-6 pb-64 md:pb-12 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none z-10 overflow-y-auto"
                         style={{ color: 'transparent', caretColor: 'var(--foreground)' }}
                     />
                     <HashtagDropdown

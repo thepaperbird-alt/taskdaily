@@ -22,7 +22,7 @@ export default async function Page({
   const allTags = await getTags();
 
   return (
-    <main className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
+    <main className="h-[100dvh] flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
       {/* Header */}
       <header className="h-auto min-h-[5rem] md:min-h-[7rem] py-2 px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">

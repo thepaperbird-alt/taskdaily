@@ -12,8 +12,8 @@ export default async function DailyColumn({ dateStr }: { dateStr?: string; filte
     const allTags = await getTags();
 
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-hidden pb-4">
+        <div className="h-full flex flex-col min-h-0">
+            <div className="flex-1 overflow-hidden pb-4 min-h-0">
                 <DailyEditor daily={daily || undefined} date={currentDate} allTags={allTags} />
             </div>
         </div>
