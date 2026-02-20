@@ -206,7 +206,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     {/* Overlay for coloring */}
                     <div
                         id="editor-overlay"
-                        className="absolute inset-0 p-6 whitespace-pre-wrap font-mono text-base leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
+                        className="absolute inset-0 p-6 pb-64 md:pb-12 whitespace-pre-wrap font-mono text-base leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
                         aria-hidden="true"
                     >
                         {overlayContent}
@@ -221,7 +221,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                         onSelect={handleContentSelect}
                         onScroll={handleScroll}
                         placeholder="Start typing..."
-                        className="w-full h-full p-6 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none relative z-10"
+                        className="w-full h-full p-6 pb-64 md:pb-12 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none relative z-10"
                         style={{ color: 'transparent', caretColor: 'var(--foreground)' }}
                     />
                     <HashtagDropdown
