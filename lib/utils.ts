@@ -22,5 +22,5 @@ export function stringToBgColor(str: string): string {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = Math.abs(hash % 360);
-    return `hsl(${hue}, 85%, 92%)`; // Very light pastel background
+    return `hsl(${hue}, 75%, 85%)`; // Slightly more distinct pastel background
 }
