@@ -24,9 +24,9 @@ export default async function Page({
   return (
     <main className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
       {/* Header */}
-      <header className="h-14 px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between shrink-0">
+      <header className="h-20 px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="TaskDaily Logo" className="h-[2.5rem] md:h-12 w-auto object-contain" />
+          <img src="/logo.png" alt="TaskDaily Logo" className="h-[3rem] md:h-[72px] w-auto object-contain" />
         </div>
         <div className="hidden md:flex items-center gap-4">
           <ExportSummaryButton week={week} />
