@@ -55,7 +55,7 @@ export default async function Page({
         />
 
         {/* Mobile View */}
-        <div className="md:hidden h-full pb-20 p-4 overflow-y-auto">
+        <div className="md:hidden flex-1 p-4 flex flex-col min-h-0">
           {tab === 'tasks' && <TaskList filterTags={tagsFilter} />}
           {tab === 'dailies' && <DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
           {tab === 'summary' && <SummaryColumn dateStr={week} filterTags={tagsFilter} />}

@@ -69,7 +69,7 @@ export default function TaskListClient({ tasks, allTags }: { tasks: Task[], allT
                 </form>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800 pb-20">
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800 pb-20">
                 {tasks.length === 0 ? (
                     <div className="text-center text-neutral-400 mt-10 text-sm">
                         No tasks yet. Add one above!

@@ -50,7 +50,7 @@ export default function SummaryColumnClient({ metrics, tags, summaryData, curren
 
             <TagFilterBar tags={tags} />
 
-            <div className="space-y-4 pr-2 overflow-y-auto pb-20 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
+            <div className="flex-1 min-h-0 space-y-4 pr-2 overflow-y-auto pb-20 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
                 <div className="card">
                     <h3 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-3">Tasks Created & Progress</h3>
                     <div className="flex justify-between items-end mb-2">
