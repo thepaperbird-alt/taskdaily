@@ -18,7 +18,11 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     const [tasks, setTasks] = useState<Task[]>(daily?.tasks || []);
     const [isAddingTask, setIsAddingTask] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const overlayRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+
+    // Quick Note state
+    const [noteInputValue, setNoteInputValue] = useState("");
 
     // Autocomplete for content
     const {
@@ -83,6 +87,35 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         } catch (err) {
             console.error("Failed to add task", err);
         }
+    };
+
+    const handleAddNote = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!noteInputValue.trim()) return;
+
+        const prefix = content.length > 0 && !content.endsWith('\n') ? '\n- ' : '- ';
+        const newText = content + prefix + noteInputValue.trim();
+        setContent(newText);
+        setNoteInputValue('');
+
+        // Scroll to bottom
+        setTimeout(() => {
+            if (textareaRef.current) {
+                textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+            }
+            if (overlayRef.current) {
+                overlayRef.current.scrollTop = overlayRef.current.scrollHeight;
+            }
+        }, 50);
+
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(async () => {
+            try {
+                await createOrUpdateDaily(format(date, 'yyyy-MM-dd'), newText, daily?.id);
+            } catch (err) {
+                console.error("Failed to save daily", err);
+            }
+        }, 1000);
     };
 
     const insertFormatting = (type: 'bullet' | 'number') => {
@@ -160,19 +193,18 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     });
 
     const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
-        const overlay = document.getElementById('editor-overlay');
-        if (overlay) {
-            overlay.scrollTop = e.currentTarget.scrollTop;
-            overlay.scrollLeft = e.currentTarget.scrollLeft;
+        if (overlayRef.current) {
+            overlayRef.current.scrollTop = e.currentTarget.scrollTop;
+            overlayRef.current.scrollLeft = e.currentTarget.scrollLeft;
         }
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+        <div className="flex flex-col h-full bg-white dark:bg-neutral-900 md:rounded-xl md:shadow-sm border-t md:border border-neutral-200 dark:border-neutral-800 overflow-hidden">
             {/* Header / Toolbar */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-white dark:bg-neutral-800 rounded-lg p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-sm">
+            <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 gap-2">
+                <div className="flex items-center gap-2 md:gap-4 shrink min-w-0">
+                    <div className="flex items-center shrink-0 bg-white dark:bg-neutral-800 rounded-lg p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-sm">
                         <Link href={`/?date=${prevDay}`} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors">
                             <ChevronLeft size={16} />
                         </Link>
@@ -183,9 +215,9 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                             <ChevronRight size={16} />
                         </Link>
                     </div>
-                    <h2 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
-                        <CalendarIcon size={14} className="text-neutral-400" />
-                        {formattedDate}
+                    <h2 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1 md:gap-2 shrink min-w-0">
+                        <CalendarIcon size={14} className="text-neutral-400 shrink-0" />
+                        <span className="truncate">{formattedDate}</span>
                     </h2>
                 </div>
 
@@ -206,7 +238,8 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     {/* Overlay for coloring */}
                     <div
                         id="editor-overlay"
-                        className="absolute inset-0 p-6 pb-64 md:pb-12 whitespace-pre-wrap font-mono text-base leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
+                        ref={overlayRef}
+                        className="absolute inset-0 p-4 md:p-6 pb-32 md:pb-12 whitespace-pre-wrap font-mono text-base md:text-[17px] leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
                         aria-hidden="true"
                     >
                         {overlayContent}
@@ -221,7 +254,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                         onSelect={handleContentSelect}
                         onScroll={handleScroll}
                         placeholder="Start typing..."
-                        className="absolute inset-0 w-full h-full p-6 pb-64 md:pb-12 bg-transparent text-base leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none z-10 overflow-y-auto"
+                        className="absolute inset-0 w-full h-full p-4 md:p-6 pb-32 md:pb-12 bg-transparent text-base md:text-[17px] leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none z-10 overflow-y-auto"
                         style={{ color: 'transparent', caretColor: 'var(--foreground)' }}
                     />
                     <HashtagDropdown
@@ -238,7 +271,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                 </div>
 
                 {/* Inline Tasks Section */}
-                <div className="border-t border-neutral-100 dark:border-neutral-800 p-4 bg-neutral-50/30 dark:bg-neutral-900/30">
+                <div className="border-t border-neutral-100 dark:border-neutral-800 p-3 md:p-4 bg-neutral-50/30 dark:bg-neutral-900/30">
                     <div className="mb-2 flex items-center justify-between">
                         <span className="text-xs font-medium text-neutral-500 uppercase tracking-widest">Linked Tasks</span>
                         {!isAddingTask && (
@@ -292,6 +325,26 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                             </button>
                         </form>
                     )}
+                </div>
+
+                {/* Quick Add Note Section */}
+                <div className="border-t border-neutral-200 dark:border-neutral-800 p-2 md:p-3 bg-white dark:bg-neutral-900">
+                    <form onSubmit={handleAddNote} className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="Type a quick note and hit Enter..."
+                            value={noteInputValue}
+                            onChange={(e) => setNoteInputValue(e.target.value)}
+                            className="flex-1 input text-sm py-2 px-3 border-neutral-200 dark:border-neutral-800 bg-neutral-50 focus:bg-white dark:bg-neutral-800/50 dark:focus:bg-neutral-800"
+                        />
+                        <button
+                            type="submit"
+                            disabled={!noteInputValue.trim()}
+                            className="btn btn-primary px-4 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Add
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

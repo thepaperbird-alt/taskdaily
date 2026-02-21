@@ -55,10 +55,10 @@ export default async function Page({
         />
 
         {/* Mobile View */}
-        <div className="md:hidden flex-1 p-4 flex flex-col min-h-0">
-          {tab === 'tasks' && <TaskList filterTags={tagsFilter} />}
-          {tab === 'dailies' && <DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
-          {tab === 'summary' && <SummaryColumn dateStr={week} filterTags={tagsFilter} />}
+        <div className="md:hidden flex-1 p-0 pb-20 flex flex-col min-h-0">
+          {tab === 'tasks' && <div className="p-4 h-full"><TaskList filterTags={tagsFilter} /></div>}
+          {tab === 'dailies' && <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-neutral-900"><DailyColumn dateStr={dateStr} filterTags={tagsFilter} /></div>}
+          {tab === 'summary' && <div className="p-4 h-full"><SummaryColumn dateStr={week} filterTags={tagsFilter} /></div>}
         </div>
       </div>
 
