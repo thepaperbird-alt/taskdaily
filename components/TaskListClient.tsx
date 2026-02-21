@@ -74,6 +74,10 @@ export default function TaskListClient({ tasks, allTags }: { tasks: Task[], allT
                 orderArray.forEach((id, index) => orderMap.set(id, index));
 
                 const sorted = [...tasks].sort((a, b) => {
+                    // Always put completed tasks at the bottom
+                    if (a.completed && !b.completed) return 1;
+                    if (!a.completed && b.completed) return -1;
+
                     const indexA = orderMap.has(a.id) ? orderMap.get(a.id) : Infinity;
                     const indexB = orderMap.has(b.id) ? orderMap.get(b.id) : Infinity;
                     if (indexA !== indexB) return indexA - indexB;
@@ -81,10 +85,19 @@ export default function TaskListClient({ tasks, allTags }: { tasks: Task[], allT
                 });
                 setOrderedTasks(sorted);
             } catch (e) {
-                setOrderedTasks(tasks);
+                // Fallback sort if parsing fails
+                setOrderedTasks([...tasks].sort((a, b) => {
+                    if (a.completed && !b.completed) return 1;
+                    if (!a.completed && b.completed) return -1;
+                    return 0;
+                }));
             }
         } else {
-            setOrderedTasks(tasks);
+            setOrderedTasks([...tasks].sort((a, b) => {
+                if (a.completed && !b.completed) return 1;
+                if (!a.completed && b.completed) return -1;
+                return 0;
+            }));
         }
 
         return () => window.removeEventListener('resize', handleResize);
