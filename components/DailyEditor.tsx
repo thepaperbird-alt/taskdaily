@@ -328,7 +328,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                 </div>
 
                 {/* Quick Add Note Section */}
-                <div className="border-t border-neutral-200 dark:border-neutral-800 p-2 md:p-3 bg-white dark:bg-neutral-900">
+                <div className="border-t border-neutral-200 dark:border-neutral-800 p-2 md:p-3 bg-white dark:bg-neutral-900 shrink-0 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] dark:shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.2)] relative z-20">
                     <form onSubmit={handleAddNote} className="flex gap-2">
                         <input
                             type="text"
@@ -345,6 +345,22 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                             Add
                         </button>
                     </form>
+                </div>
+
+                {/* Mobile Preview of Notes (only visible on mobile, pulls text from editor) */}
+                <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-4 shrink-0 overflow-y-auto max-h-[40vh]">
+                    <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">Today's Notes</h3>
+                    {content.trim() ? (
+                        <div className="space-y-2">
+                            {content.split('\n').filter(line => line.trim().length > 0).reverse().map((line, i) => (
+                                <div key={i} className="text-sm text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-800">
+                                    {line.replace(/^-\s*/, '')}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-sm text-neutral-400 italic text-center py-4">No notes yet today.</div>
+                    )}
                 </div>
             </div>
         </div>
