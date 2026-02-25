@@ -26,7 +26,7 @@ export default async function Page({
       {/* Header */}
       <header className="h-auto min-h-[5rem] md:min-h-[7rem] py-2 px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="TaskDaily Logo" className="h-16 md:h-24 w-auto object-contain" />
+          <img src="/logo.png" alt="TaskDaily Logo" className="h-20 md:h-32 w-auto object-contain" />
         </div>
         <div className="hidden md:flex items-center gap-4">
           <ExportSummaryButton week={week} />

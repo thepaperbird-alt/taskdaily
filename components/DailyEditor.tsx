@@ -208,9 +208,11 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                         <Link href={`/?date=${prevDay}`} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors">
                             <ChevronLeft size={16} />
                         </Link>
-                        <Link href={`/?date=${format(new Date(), 'yyyy-MM-dd')}`} className="px-3 py-1 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md transition-colors border-x border-transparent hover:border-neutral-200 dark:hover:border-neutral-700">
-                            Today
-                        </Link>
+                        {isToday(date) && (
+                            <Link href={`/?date=${format(new Date(), 'yyyy-MM-dd')}`} className="px-3 py-1 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md transition-colors border-x border-transparent hover:border-neutral-200 dark:hover:border-neutral-700">
+                                Today
+                            </Link>
+                        )}
                         <Link href={`/?date=${nextDay}`} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors">
                             <ChevronRight size={16} />
                         </Link>

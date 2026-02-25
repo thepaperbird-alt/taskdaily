@@ -148,8 +148,6 @@ export default function TaskListClient({ tasks, allTags }: { tasks: Task[], allT
 
     return (
         <div className="h-full flex flex-col">
-            <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent px-1">Tasks</h2>
-
             <div className="relative mb-6">
                 <form action={handleSubmit} ref={formRef} className="flex gap-2">
                     <div className="relative flex-1">
