@@ -75,7 +75,7 @@ export default function TaskItem({ task }: { task: Task }) {
 
             <button
                 onClick={handleDelete}
-                className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-red-600 transition-all shrink-0 hover:bg-white/50 rounded"
+                className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 p-1 text-neutral-500 hover:text-red-600 transition-all shrink-0 hover:bg-white/50 rounded"
                 aria-label="Delete task"
             >
                 <Trash2 size={14} />
