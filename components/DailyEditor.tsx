@@ -12,6 +12,7 @@ import { useHashtagAutocomplete } from './useHashtagAutocomplete';
 import HashtagDropdown from './HashtagDropdown';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import MiniCalendar from './MiniCalendar';
 
 export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; date: Date; allTags?: any[] }) {
     const [content, setContent] = useState(daily?.content || '');
@@ -20,6 +21,10 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+
+    // Calendar state
+    const [showCalendar, setShowCalendar] = useState(false);
+    const calendarRef = useRef<HTMLDivElement>(null);
 
     // Quick Note state
     const [noteInputValue, setNoteInputValue] = useState("");
@@ -56,6 +61,18 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         setContent(daily?.content || '');
         setTasks(daily?.tasks || []);
     }, [daily?.entry_date]); // Only update content if we switch days
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+                setShowCalendar(false);
+            }
+        };
+        if (showCalendar) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showCalendar]);
 
     const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         handleContentChangeWrapper(e);
@@ -217,10 +234,21 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                             <ChevronRight size={16} />
                         </Link>
                     </div>
-                    <h2 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1 md:gap-2 shrink min-w-0">
-                        <CalendarIcon size={14} className="text-neutral-400 shrink-0" />
-                        <span className="truncate">{formattedDate}</span>
-                    </h2>
+                    <div className="relative flex items-center shrink min-w-0" ref={calendarRef}>
+                        <button
+                            onClick={() => setShowCalendar(!showCalendar)}
+                            className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1 md:gap-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 p-1.5 -ml-1.5 rounded-md transition-colors min-w-0"
+                        >
+                            <CalendarIcon size={14} className="text-neutral-400 shrink-0" />
+                            <span className="truncate">{formattedDate}</span>
+                        </button>
+
+                        {showCalendar && (
+                            <div className="absolute top-full left-0 mt-1 z-50">
+                                <MiniCalendar selectedDate={date} onClose={() => setShowCalendar(false)} />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-1 bg-white dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
