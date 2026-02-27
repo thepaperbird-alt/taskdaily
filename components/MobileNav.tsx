@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { List, Calendar, PieChart } from 'lucide-react';
+import { List, Calendar, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function MobileNav({ activeTab }: { activeTab: string }) {
     const navItems = [
         { id: 'tasks', label: 'Tasks', icon: List },
         { id: 'dailies', label: 'Dailies', icon: Calendar },
-        { id: 'summary', label: 'Summary', icon: PieChart },
+        { id: 'calendar', label: 'Calendar', icon: CalendarDays },
     ];
 
     return (

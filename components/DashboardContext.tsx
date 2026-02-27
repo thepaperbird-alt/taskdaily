@@ -3,19 +3,19 @@
 import { createContext, useContext, useState } from 'react';
 
 type DashboardContextType = {
-    isSummaryCollapsed: boolean;
-    toggleSummary: () => void;
+    isCalendarCollapsed: boolean;
+    toggleCalendar: () => void;
 };
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(true);
+    const [isCalendarCollapsed, setIsCalendarCollapsed] = useState(true);
 
-    const toggleSummary = () => setIsSummaryCollapsed(prev => !prev);
+    const toggleCalendar = () => setIsCalendarCollapsed(prev => !prev);
 
     return (
-        <DashboardContext.Provider value={{ isSummaryCollapsed, toggleSummary }}>
+        <DashboardContext.Provider value={{ isCalendarCollapsed, toggleCalendar }}>
             {children}
         </DashboardContext.Provider>
     );

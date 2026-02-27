@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import TaskList from '@/components/TaskList';
 import DailyColumn from '@/components/DailyColumn';
-import SummaryColumn from '@/components/SummaryColumn';
+import CalendarColumn from '@/components/CalendarColumn';
 import MobileNav from '@/components/MobileNav';
 import ExportSummaryButton from '@/components/ExportSummaryButton';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -29,7 +29,7 @@ export default async function Page({
           <img src="/logo.png" alt="TaskDaily Logo" className="h-20 md:h-32 w-auto object-contain" />
         </div>
         <div className="hidden md:flex items-center gap-4">
-          <ExportSummaryButton week={week} />
+
           {/* New Task is handled in columns mostly, but we can have global add */}
           {/* For now, just placeholder or link to focus task input */}
           <button className="btn btn-primary text-sm shadow-md">+ New Task</button>
@@ -51,14 +51,14 @@ export default async function Page({
             </div>
           }
           dailies={<DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
-          summary={<SummaryColumn dateStr={week} filterTags={tagsFilter} />}
+          calendar={<CalendarColumn dateStr={dateStr} />}
         />
 
         {/* Mobile View */}
         <div className="md:hidden flex-1 p-0 pb-20 flex flex-col min-h-0">
           {tab === 'tasks' && <div className="p-4 h-full"><TaskList filterTags={tagsFilter} /></div>}
           {tab === 'dailies' && <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-neutral-900"><DailyColumn dateStr={dateStr} filterTags={tagsFilter} /></div>}
-          {tab === 'summary' && <div className="p-4 h-full"><SummaryColumn dateStr={week} filterTags={tagsFilter} /></div>}
+          {tab === 'calendar' && <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-neutral-900"><CalendarColumn dateStr={dateStr} /></div>}
         </div>
       </div>
 
