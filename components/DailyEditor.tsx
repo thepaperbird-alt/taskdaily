@@ -269,10 +269,11 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     <div
                         id="editor-overlay"
                         ref={overlayRef}
-                        className="absolute inset-0 p-4 md:p-6 pb-32 md:pb-12 whitespace-pre-wrap font-mono text-base md:text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
+                        className="absolute inset-0 p-4 md:p-6 pb-32 md:pb-12 whitespace-pre-wrap break-words font-mono text-base md:text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
                         aria-hidden="true"
                     >
                         {overlayContent}
+                        {content.endsWith('\n') ? <br /> : null}
                     </div>
 
                     {/* Actual Editor */}
