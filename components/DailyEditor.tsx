@@ -269,10 +269,11 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     <div
                         id="editor-overlay"
                         ref={overlayRef}
-                        className="absolute inset-0 p-4 md:p-6 pb-32 md:pb-12 whitespace-pre-wrap font-mono text-base md:text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-hidden"
+                        className="absolute inset-0 w-full h-full p-4 md:p-6 pb-32 md:pb-12 whitespace-pre-wrap break-words font-mono text-base md:text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300 pointer-events-none overflow-y-auto"
                         aria-hidden="true"
                     >
                         {overlayContent}
+                        {content.endsWith('\n') ? <br /> : null}
                     </div>
 
                     {/* Actual Editor */}
@@ -284,7 +285,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                         onSelect={handleContentSelect}
                         onScroll={handleScroll}
                         placeholder="Start typing..."
-                        className="absolute inset-0 w-full h-full p-4 md:p-6 pb-32 md:pb-12 bg-transparent text-base md:text-[12px] leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none z-10 overflow-y-auto"
+                        className="absolute inset-0 w-full h-full p-4 md:p-6 pb-32 md:pb-12 whitespace-pre-wrap break-words bg-transparent text-base md:text-[12px] leading-relaxed font-mono text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 resize-none focus:outline-none z-10 overflow-y-auto"
                         style={{ color: 'transparent', caretColor: 'var(--foreground)' }}
                     />
                     <HashtagDropdown
