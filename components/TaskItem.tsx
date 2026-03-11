@@ -69,6 +69,7 @@ export default function TaskItem({ task }: { task: Task }) {
                     <TagSelector
                         taskId={task.id}
                         assignedTags={task.tags || []}
+                        hideTagsInText={task.title}
                     />
                 </div>
             </div>

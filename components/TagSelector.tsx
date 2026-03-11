@@ -13,11 +13,13 @@ export default function TagSelector({
     taskId,
     dailyId,
     assignedTags = [],
+    hideTagsInText,
     onTagChange
 }: {
     taskId?: string;
     dailyId?: string;
     assignedTags: Tag[];
+    hideTagsInText?: string;
     onTagChange?: (tags: Tag[]) => void;
 }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -96,21 +98,23 @@ export default function TagSelector({
         <div className="relative" ref={dropdownRef}>
             {/* Render Assigned Tags */}
             <div className="flex flex-wrap gap-1 items-center">
-                {assignedTags.map(tag => (
-                    <div
-                        key={tag.id}
-                        className="text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1 border border-transparent"
-                        style={{
-                            backgroundColor: stringToBgColor(tag.name),
-                            color: stringToColor(tag.name)
-                        }}
-                    >
-                        {tag.name}
-                        <button onClick={() => handleSelectTag(tag)} className="hover:opacity-70">
-                            <X size={10} />
-                        </button>
-                    </div>
-                ))}
+                {assignedTags
+                    .filter(tag => !hideTagsInText || !hideTagsInText.toLowerCase().includes(`#${tag.name.toLowerCase()}`))
+                    .map(tag => (
+                        <div
+                            key={tag.id}
+                            className="text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1 border border-transparent"
+                            style={{
+                                backgroundColor: stringToBgColor(tag.name),
+                                color: stringToColor(tag.name)
+                            }}
+                        >
+                            {tag.name}
+                            <button onClick={() => handleSelectTag(tag)} className="hover:opacity-70">
+                                <X size={10} />
+                            </button>
+                        </div>
+                    ))}
                 <button
                     onClick={handleOpen}
                     className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors p-0.5"
