@@ -125,33 +125,38 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
     const containerItems = newItems.filter(i => i.status === overContainer).sort((a,b) => a.order_index - b.order_index);
     
     const oldIndex = containerItems.findIndex(i => i.id === activeId);
-    const newIndex = containerItems.findIndex(i => i.id === overId);
+    let newIndex = containerItems.findIndex(i => i.id === overId);
+    
+    if (newIndex === -1) {
+        newIndex = containerItems.length - 1;
+    }
 
-    if (oldIndex !== newIndex) {
-      const reorderedContainerItems = arrayMove(containerItems, oldIndex, newIndex);
-      
-      // Update items array locally
-      const itemsWithoutContainer = newItems.filter(i => i.status !== overContainer);
-      newItems = [...itemsWithoutContainer, ...reorderedContainerItems.map((item, index) => ({
-          ...item,
-          order_index: index * 1024
-      }))];
-      
-      setItems(newItems);
+    const reorderedContainerItems = arrayMove(containerItems, oldIndex, newIndex);
+    
+    // Update items array locally
+    const itemsWithoutContainer = newItems.filter(i => i.status !== overContainer);
+    newItems = [...itemsWithoutContainer, ...reorderedContainerItems.map((item, index) => ({
+        ...item,
+        status: overContainer as any,
+        order_index: index * 1024
+    }))];
+    
+    setItems(newItems);
 
-      // Persist to server
-      const updates = reorderedContainerItems.map((item, index) => ({
-          id: item.id,
-          status: overContainer as any,
-          order_index: index * 1024
-      }));
-      
-      await updateMediaOrder(updates);
-    } else if (activeItem.status !== overContainer) {
-       // Just dropped into empty container
-       const updatedItem = { ...activeItem, status: overContainer as any, order_index: 0 };
-       setItems((prev) => [...prev.filter(i => i.id !== activeId), updatedItem]);
-       await updateMediaItem(activeId, { status: overContainer as any, order_index: 0 });
+    // Compute if anything actually changed compared to initialMedia (the source of truth)
+    const hasChanges = reorderedContainerItems.some((item, index) => {
+        const original = initialMedia.find(i => i.id === item.id);
+        const newOrder = index * 1024;
+        return !original || original.status !== overContainer || original.order_index !== newOrder;
+    });
+
+    if (hasChanges) {
+        const updates = reorderedContainerItems.map((item, index) => ({
+            id: item.id,
+            status: overContainer as any,
+            order_index: index * 1024
+        }));
+        await updateMediaOrder(updates);
     }
   };
 
