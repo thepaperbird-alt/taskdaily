@@ -10,11 +10,13 @@ import TaskItem from './TaskItem';
 import TagSelector from './TagSelector';
 import { useHashtagAutocomplete } from './useHashtagAutocomplete';
 import HashtagDropdown from './HashtagDropdown';
+import HashtagManager from './HashtagManager';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MiniCalendar from './MiniCalendar';
 
 export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; date: Date; allTags?: any[] }) {
+    const [activeTab, setActiveTab] = useState<'daily' | 'hashtags'>('daily');
     const [content, setContent] = useState(daily?.content || '');
     const [tasks, setTasks] = useState<Task[]>(daily?.tasks || []);
     const [isAddingTask, setIsAddingTask] = useState(false);
@@ -218,8 +220,36 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-neutral-900 md:rounded-xl md:shadow-sm border-t md:border border-neutral-200 dark:border-neutral-800 overflow-hidden">
-            {/* Header / Toolbar */}
-            <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 gap-2">
+            {/* Tabs */}
+            <div className="flex p-1 md:p-1.5 m-2 md:m-3 bg-neutral-100 dark:bg-neutral-800/50 rounded-lg shrink-0 gap-1">
+                <button
+                    onClick={() => setActiveTab('daily')}
+                    className={cn(
+                        "flex-1 py-2 md:py-1.5 text-sm md:text-xs font-semibold text-center transition-all rounded-md touch-manipulation",
+                        activeTab === 'daily' 
+                            ? "text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-700 shadow-sm" 
+                            : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                    )}
+                >
+                    Daily
+                </button>
+                <button
+                    onClick={() => setActiveTab('hashtags')}
+                    className={cn(
+                        "flex-1 py-2 md:py-1.5 text-sm md:text-xs font-semibold text-center transition-all rounded-md touch-manipulation",
+                        activeTab === 'hashtags' 
+                            ? "text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-700 shadow-sm" 
+                            : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                    )}
+                >
+                    Hashtags
+                </button>
+            </div>
+
+            {activeTab === 'daily' ? (
+                <>
+                    {/* Header / Toolbar */}
+                    <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 gap-2 shrink-0">
                 <div className="flex items-center gap-2 md:gap-4 shrink min-w-0">
                     <div className="flex items-center shrink-0 bg-white dark:bg-neutral-800 rounded-lg p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-sm">
                         <Link href={`/?date=${prevDay}`} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors">
@@ -394,6 +424,12 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     )}
                 </div>
             </div>
+            </>
+            ) : (
+                <div className="flex-1 overflow-hidden p-0 border-0 h-full">
+                    <HashtagManager tags={allTags || []} />
+                </div>
+            )}
         </div>
     );
 }

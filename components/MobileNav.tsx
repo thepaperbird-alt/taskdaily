@@ -1,11 +1,13 @@
 import Link from 'next/link';
-import { List, Calendar } from 'lucide-react';
+import { List, Calendar, Hash, Tv } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function MobileNav({ activeTab }: { activeTab: string }) {
     const navItems = [
-        { id: 'tasks', label: 'Tasks', icon: List },
-        { id: 'dailies', label: 'Dailies', icon: Calendar },
+        { id: 'tasks', label: 'Tasks', icon: List, type: 'searchParams' },
+        { id: 'dailies', label: 'Daily Notes', icon: Calendar, type: 'searchParams' },
+        { id: 'hashtags', label: 'Hashtags', icon: Hash, type: 'searchParams' },
+        { id: 'watchlist', label: 'Watchlist', icon: Tv, type: 'route', href: '/watchlist' },
     ];
 
     return (
@@ -17,7 +19,7 @@ export default function MobileNav({ activeTab }: { activeTab: string }) {
                     return (
                         <Link
                             key={item.id}
-                            href={`/?tab=${item.id}`}
+                            href={item.type === 'route' ? (item.href as string) : `/?tab=${item.id}`}
                             className={cn(
                                 "flex flex-col items-center justify-center w-full h-full space-y-1",
                                 isActive ? "text-neutral-900 dark:text-white" : "text-neutral-500"

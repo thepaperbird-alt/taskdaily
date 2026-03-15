@@ -3,6 +3,7 @@ import TaskList from '@/components/TaskList';
 import DailyColumn from '@/components/DailyColumn';
 import CalendarColumn from '@/components/CalendarColumn';
 import MobileNav from '@/components/MobileNav';
+import Link from 'next/link';
 
 import DashboardLayout from '@/components/DashboardLayout';
 import HashtagManager from '@/components/HashtagManager';
@@ -28,6 +29,10 @@ export default async function Page({
         <div className="flex items-center gap-2">
           <img src="/logo.png" alt="TaskDaily Logo" className="h-24 md:h-32 w-auto object-contain" />
         </div>
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="/" className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Tasks</Link>
+          <Link href="/watchlist" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors">Watchlist</Link>
+        </div>
         <div className="hidden md:flex items-center gap-4">
 
           {/* New Task is handled in columns mostly, but we can have global add */}
@@ -41,13 +46,8 @@ export default async function Page({
         {/* Desktop Grid via DashboardLayout */}
         <DashboardLayout
           tasks={
-            <div className="flex flex-col h-full gap-4">
-              <div className="flex-1 overflow-hidden">
-                <TaskList filterTags={tagsFilter} />
-              </div>
-              <div className="h-[35%] shrink-0 overflow-hidden">
-                <HashtagManager tags={allTags} />
-              </div>
+            <div className="h-full overflow-hidden">
+              <TaskList filterTags={tagsFilter} />
             </div>
           }
           dailies={<DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
@@ -55,9 +55,10 @@ export default async function Page({
         />
 
         {/* Mobile View */}
-        <div className="md:hidden flex-1 p-0 pb-20 flex flex-col min-h-0">
+        <div className="md:hidden flex-1 p-0 pb-20 flex flex-col min-h-0 bg-neutral-50 dark:bg-neutral-950">
           {tab === 'tasks' && <div className="p-4 h-full"><TaskList filterTags={tagsFilter} /></div>}
           {tab === 'dailies' && <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-neutral-900"><DailyColumn dateStr={dateStr} filterTags={tagsFilter} /></div>}
+          {tab === 'hashtags' && <div className="flex-1 p-4 h-full overflow-hidden"><HashtagManager tags={allTags} /></div>}
         </div>
       </div>
 
