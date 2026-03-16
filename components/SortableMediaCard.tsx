@@ -75,21 +75,24 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onMove }: {
                         {item.season}
                     </span>
                 )}
+                <div className="ml-auto md:hidden flex items-center">
+                    {onMove && (
+                        <button 
+                            className="text-[9px] uppercase font-bold tracking-wider bg-black text-white px-2 py-1 rounded shadow-sm border border-neutral-800 flex items-center gap-1 active:scale-95 transition-transform"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onMove();
+                            }}
+                        >
+                            Move <ArrowRight size={10} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Action Buttons */}
             <div className="absolute top-1.5 right-1.5 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                {onMove && (
-                    <button 
-                        className="p-1 text-neutral-400 md:hidden hover:text-black hover:bg-white/50 rounded transition-colors"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onMove();
-                        }}
-                    >
-                        <ArrowRight size={12} />
-                    </button>
-                )}
                 <button 
                     className="p-1 text-neutral-400 hover:text-black hover:bg-white/50 rounded transition-colors"
                     onClick={(e) => {
