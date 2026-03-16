@@ -172,16 +172,29 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
       setIsAddModalOpen(true);
   };
 
-  const handleMoveItem = async (item: MediaItem) => {
+  const handleMoveRight = async (item: MediaItem) => {
     const statuses = ['to_watch', 'current', 'completed'] as const;
     const currentIndex = statuses.indexOf(item.status as any);
-    const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+    if (currentIndex >= statuses.length - 1) return;
     
-    // Set a new order_index slightly higher than the max in the new column
-    const overItems = items.filter(i => i.status === nextStatus).sort((a,b) => a.order_index - b.order_index);
+    const nextStatus = statuses[currentIndex + 1];
+    await updateItemStatus(item, nextStatus);
+  };
+
+  const handleMoveLeft = async (item: MediaItem) => {
+    const statuses = ['to_watch', 'current', 'completed'] as const;
+    const currentIndex = statuses.indexOf(item.status as any);
+    if (currentIndex <= 0) return;
+    
+    const prevStatus = statuses[currentIndex - 1];
+    await updateItemStatus(item, prevStatus);
+  };
+
+  const updateItemStatus = async (item: MediaItem, newStatus: string) => {
+    const overItems = items.filter(i => i.status === newStatus).sort((a,b) => a.order_index - b.order_index);
     const newOrderIndex = overItems.length > 0 ? overItems[overItems.length - 1].order_index + 1024 : 1024;
 
-    const updatedItem = { ...item, status: nextStatus as any, order_index: newOrderIndex };
+    const updatedItem = { ...item, status: newStatus as any, order_index: newOrderIndex };
 
     setItems((prev) => [
         ...prev.filter(i => i.id !== item.id),
@@ -189,7 +202,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
     ]);
 
     await updateMediaItem(item.id, {
-        status: nextStatus as any,
+        status: newStatus as any,
         order_index: newOrderIndex
     });
   };
@@ -261,7 +274,8 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                                             key={item.id} 
                                             item={item} 
                                             onEdit={() => openEditModal(item)} 
-                                            onMove={() => handleMoveItem(item)}
+                                            onMoveLeft={item.status !== 'to_watch' ? () => handleMoveLeft(item) : undefined}
+                                            onMoveRight={item.status !== 'completed' ? () => handleMoveRight(item) : undefined}
                                         />
                                     ))}
                                     {colItems.length === 0 && (

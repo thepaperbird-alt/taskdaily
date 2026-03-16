@@ -3,9 +3,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MediaItem } from '@/actions/watchlist';
 import { cn } from '@/lib/utils';
-import { Film, Tv, GripVertical, Edit2, ArrowRight } from 'lucide-react';
+import { Film, Tv, GripVertical, Edit2, ArrowRight, ArrowLeft } from 'lucide-react';
 
-export function SortableMediaCard({ item, isOverlay = false, onEdit, onMove }: { item: MediaItem, isOverlay?: boolean, onEdit?: () => void, onMove?: () => void }) {
+export function SortableMediaCard({ item, isOverlay = false, onEdit, onMoveRight, onMoveLeft }: { item: MediaItem, isOverlay?: boolean, onEdit?: () => void, onMoveRight?: () => void, onMoveLeft?: () => void }) {
   const {
     attributes,
     listeners,
@@ -75,14 +75,26 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onMove }: {
                         {item.season}
                     </span>
                 )}
-                <div className="ml-auto md:hidden flex items-center">
-                    {onMove && (
+                <div className="ml-auto md:hidden flex items-center gap-1">
+                    {onMoveLeft && (
                         <button 
                             className="text-[9px] uppercase font-bold tracking-wider bg-black text-white px-2 py-1 rounded shadow-sm border border-neutral-800 flex items-center gap-1 active:scale-95 transition-transform"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                onMove();
+                                onMoveLeft();
+                            }}
+                        >
+                            <ArrowLeft size={10} />
+                        </button>
+                    )}
+                    {onMoveRight && (
+                        <button 
+                            className="text-[9px] uppercase font-bold tracking-wider bg-black text-white px-2 py-1 rounded shadow-sm border border-neutral-800 flex items-center gap-1 active:scale-95 transition-transform"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onMoveRight();
                             }}
                         >
                             Move <ArrowRight size={10} />
