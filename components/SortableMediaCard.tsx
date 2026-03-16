@@ -3,9 +3,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MediaItem } from '@/actions/watchlist';
 import { cn } from '@/lib/utils';
-import { Film, Tv, GripVertical, Edit2 } from 'lucide-react';
+import { Film, Tv, GripVertical, Edit2, ArrowRight } from 'lucide-react';
 
-export function SortableMediaCard({ item, isOverlay = false, onEdit }: { item: MediaItem, isOverlay?: boolean, onEdit?: () => void }) {
+export function SortableMediaCard({ item, isOverlay = false, onEdit, onMove }: { item: MediaItem, isOverlay?: boolean, onEdit?: () => void, onMove?: () => void }) {
   const {
     attributes,
     listeners,
@@ -77,16 +77,29 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit }: { item: M
                 )}
             </div>
 
-            {/* Edit Button overlay on hover */}
-            <button 
-                className="absolute top-1.5 right-1.5 p-1 text-neutral-400 hover:text-black hover:bg-white/50 rounded transition-colors opacity-0 group-hover:opacity-100"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit?.();
-                }}
-            >
-                <Edit2 size={12} />
-            </button>
+            {/* Action Buttons */}
+            <div className="absolute top-1.5 right-1.5 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                {onMove && (
+                    <button 
+                        className="p-1 text-neutral-400 md:hidden hover:text-black hover:bg-white/50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onMove();
+                        }}
+                    >
+                        <ArrowRight size={12} />
+                    </button>
+                )}
+                <button 
+                    className="p-1 text-neutral-400 hover:text-black hover:bg-white/50 rounded transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit?.();
+                    }}
+                >
+                    <Edit2 size={12} />
+                </button>
+            </div>
         </div>
     </div>
   );

@@ -172,6 +172,28 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
       setIsAddModalOpen(true);
   };
 
+  const handleMoveItem = async (item: MediaItem) => {
+    const statuses = ['to_watch', 'current', 'completed'] as const;
+    const currentIndex = statuses.indexOf(item.status as any);
+    const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+    
+    // Set a new order_index slightly higher than the max in the new column
+    const overItems = items.filter(i => i.status === nextStatus).sort((a,b) => a.order_index - b.order_index);
+    const newOrderIndex = overItems.length > 0 ? overItems[overItems.length - 1].order_index + 1024 : 1024;
+
+    const updatedItem = { ...item, status: nextStatus as any, order_index: newOrderIndex };
+
+    setItems((prev) => [
+        ...prev.filter(i => i.id !== item.id),
+        updatedItem
+    ]);
+
+    await updateMediaItem(item.id, {
+        status: nextStatus as any,
+        order_index: newOrderIndex
+    });
+  };
+
   return (
     <div className="h-full flex flex-col p-4 md:p-6 overflow-hidden">
         {/* Filters & Header */}
@@ -235,7 +257,12 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                             <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3">
                                 <SortableContext id={col.id} items={colItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
                                     {colItems.map((item) => (
-                                        <SortableMediaCard key={item.id} item={item} onEdit={() => openEditModal(item)} />
+                                        <SortableMediaCard 
+                                            key={item.id} 
+                                            item={item} 
+                                            onEdit={() => openEditModal(item)} 
+                                            onMove={() => handleMoveItem(item)}
+                                        />
                                     ))}
                                     {colItems.length === 0 && (
                                         <div className="h-24 rounded-xl border-2 border-dashed border-neutral-200 flex items-center justify-center text-xs text-neutral-400 italic">
