@@ -6,7 +6,7 @@ export default function MobileNav({ activeTab }: { activeTab: string }) {
     const navItems = [
         { id: 'tasks', label: 'Tasks', icon: List, type: 'searchParams' },
         { id: 'dailies', label: 'Daily Notes', icon: Calendar, type: 'searchParams' },
-        { id: 'hashtags', label: 'Hashtags', icon: Hash, type: 'searchParams' },
+        { id: 'hashtags', label: 'Topics', icon: Hash, type: 'searchParams' },
         { id: 'watchlist', label: 'Watchlist', icon: Tv, type: 'route', href: '/watchlist' },
     ];
 

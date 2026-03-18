@@ -54,22 +54,7 @@ export async function ensureTagsExist(tagNames: string[]) {
         .select('id, name')
         .in('name', tagNames);
 
-    const existingNames = new Set(existingTags?.map(t => t.name) || []);
-    const newTags = tagNames.filter(name => !existingNames.has(name));
-
-    // 2. Create missing tags
-    let createdTags: any[] = [];
-    if (newTags.length > 0) {
-        const { data, error } = await supabase
-            .from('td_tags')
-            .insert(newTags.map(name => ({ name, user_id: user.id })))
-            .select('id, name');
-
-        if (data) createdTags = data;
-        if (error) console.error("Error creating auto-tags:", error);
-    }
-
-    return [...(existingTags || []), ...createdTags];
+    return existingTags || [];
 }
 
 export async function assignTagToTask(taskId: string, tagId: string) {

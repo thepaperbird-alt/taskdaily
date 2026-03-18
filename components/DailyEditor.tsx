@@ -242,7 +242,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                             : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
                     )}
                 >
-                    Hashtags
+                    Topics
                 </button>
             </div>
 

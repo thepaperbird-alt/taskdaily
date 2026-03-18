@@ -70,3 +70,54 @@ export async function getParagraphsByTag(tagName: string) {
     // Sort by date desc
     return paragraphs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
+
+export async function searchAllParagraphs(query: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    if (!query || query.trim() === '') return [];
+
+    // 1. Search Dailies
+    const { data: dailies } = await supabase
+        .from('td_dailies')
+        .select('entry_date, content')
+        .ilike('content', `%${query}%`)
+        .order('entry_date', { ascending: false });
+
+    // 2. Search Tasks
+    const { data: tasks } = await supabase
+        .from('td_tasks')
+        .select('title, created_at, source, daily_id')
+        .ilike('title', `%${query}%`)
+        .order('created_at', { ascending: false });
+
+    const paragraphs: { date: string, text: string, type: 'daily' | 'task', id: string }[] = [];
+
+    dailies?.forEach((daily: any) => {
+        const lines = daily.content.split('\n');
+        lines.forEach((line: string) => {
+            if (line.toLowerCase().includes(query.toLowerCase())) {
+                paragraphs.push({
+                    date: daily.entry_date,
+                    text: line.trim(),
+                    type: 'daily',
+                    id: `${daily.entry_date}-${line.substring(0, 10)}`
+                });
+            }
+        });
+    });
+
+    tasks?.forEach((task: any) => {
+        if (task.title.toLowerCase().includes(query.toLowerCase())) {
+            paragraphs.push({
+                date: task.created_at,
+                text: task.title,
+                type: 'task',
+                id: task.id || `task-${task.created_at}`
+            });
+        }
+    });
+
+    return paragraphs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
