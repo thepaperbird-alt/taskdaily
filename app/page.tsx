@@ -31,7 +31,7 @@ export default async function Page({
         </div>
         <div className="hidden md:flex items-center gap-6">
           <Link href="/" className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Tasks</Link>
-          <Link href="/watchlist" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors">Watchlist</Link>
+          <Link href="/watchlist" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors">Lists</Link>
         </div>
         <div className="hidden md:flex items-center gap-4">
 
