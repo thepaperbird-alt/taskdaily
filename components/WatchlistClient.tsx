@@ -21,7 +21,7 @@ import {
 } from '@dnd-kit/sortable';
 import { MediaItem, updateMediaOrder, updateMediaItem } from '@/actions/watchlist';
 import { cn } from '@/lib/utils';
-import { Plus, Tv, Film, MoreVertical, Edit2 } from 'lucide-react';
+import { Plus, Tv, Film, MoreVertical, Edit2, Gamepad2, ShoppingBag } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableMediaCard } from './SortableMediaCard';
 import AddMediaModal from './AddMediaModal';
@@ -41,7 +41,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
   const [items, setItems] = useState<MediaItem[]>(initialMedia);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'to_watch' | 'current' | 'completed'>('to_watch');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'tv'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'tv' | 'game' | 'gadget'>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addStatus, setAddStatus] = useState<'to_watch' | 'current' | 'completed'>('to_watch');
   const [editItem, setEditItem] = useState<MediaItem | null>(null);
@@ -231,6 +231,8 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                 <button onClick={() => setTypeFilter('all')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors", typeFilter === 'all' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}>All</button>
                 <button onClick={() => setTypeFilter('movie')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'movie' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Film size={14}/> Movies</button>
                 <button onClick={() => setTypeFilter('tv')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'tv' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Tv size={14}/> Shows</button>
+                <button onClick={() => setTypeFilter('game')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'game' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Gamepad2 size={14}/> Games</button>
+                <button onClick={() => setTypeFilter('gadget')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'gadget' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><ShoppingBag size={14}/> Gadgets</button>
             </div>
         </div>
 

@@ -3,9 +3,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MediaItem } from '@/actions/watchlist';
 import { cn } from '@/lib/utils';
-import { Film, Tv, GripVertical, Edit2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Film, Tv, GripVertical, Edit2, ArrowRight, ArrowLeft, Gamepad2, ShoppingBag, Trash2 } from 'lucide-react';
 
-export function SortableMediaCard({ item, isOverlay = false, onEdit, onMoveRight, onMoveLeft }: { item: MediaItem, isOverlay?: boolean, onEdit?: () => void, onMoveRight?: () => void, onMoveLeft?: () => void }) {
+export function SortableMediaCard({ item, isOverlay = false, onEdit, onDelete, onMoveRight, onMoveLeft }: { item: MediaItem, isOverlay?: boolean, onEdit?: () => void, onDelete?: () => void, onMoveRight?: () => void, onMoveLeft?: () => void }) {
   const {
     attributes,
     listeners,
@@ -20,11 +20,13 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onMoveRight
     transition,
   };
 
-  const Icon = item.type === 'movie' ? Film : Tv;
+  const Icon = item.type === 'movie' ? Film : item.type === 'game' ? Gamepad2 : item.type === 'gadget' ? ShoppingBag : Tv;
   
-  const bgColors = {
+  const bgColors: Record<string, string> = {
       'movie': 'border-l-pink-400 bg-pink-50/50',
-      'tv': 'border-l-yellow-400 bg-yellow-50/50'
+      'tv': 'border-l-yellow-400 bg-yellow-50/50',
+      'game': 'border-l-purple-400 bg-purple-50/50',
+      'gadget': 'border-l-teal-400 bg-teal-50/50'
   };
 
   return (
@@ -105,6 +107,17 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onMoveRight
 
             {/* Action Buttons */}
             <div className="absolute top-1.5 right-1.5 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <button 
+                    className="p-1 text-red-400 hover:text-white hover:bg-red-500 rounded transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm('Delete this item?')) {
+                            onDelete?.();
+                        }
+                    }}
+                >
+                    <Trash2 size={12} />
+                </button>
                 <button 
                     className="p-1 text-neutral-400 hover:text-black hover:bg-white/50 rounded transition-colors"
                     onClick={(e) => {
