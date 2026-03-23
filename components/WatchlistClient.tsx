@@ -19,7 +19,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { MediaItem, updateMediaOrder, updateMediaItem } from '@/actions/watchlist';
+import { MediaItem, updateMediaOrder, updateMediaItem, deleteMediaItem } from '@/actions/watchlist';
 import { cn } from '@/lib/utils';
 import { Plus, Tv, Film, MoreVertical, Edit2, Gamepad2, ShoppingBag } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
@@ -27,9 +27,9 @@ import { SortableMediaCard } from './SortableMediaCard';
 import AddMediaModal from './AddMediaModal';
 
 const COLUMNS = [
-  { id: 'to_watch', title: 'To Watch', color: 'bg-pink-100/50', border: 'border-pink-200' },
-  { id: 'current', title: 'Current Watch', color: 'bg-yellow-100/50', border: 'border-yellow-200' },
-  { id: 'completed', title: 'Completed', color: 'bg-green-100/50', border: 'border-green-200' }
+  { id: 'to_watch', title: 'Waiting', color: 'bg-pink-100/50', border: 'border-pink-200' },
+  { id: 'current', title: 'Current', color: 'bg-yellow-100/50', border: 'border-yellow-200' },
+  { id: 'completed', title: 'Done', color: 'bg-green-100/50', border: 'border-green-200' }
 ];
 
 function DroppableColumn({ id, children, className }: { id: string, children: React.ReactNode, className: string }) {
@@ -207,6 +207,11 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
     });
   };
 
+  const handleDelete = async (id: string) => {
+    setItems((prev) => prev.filter(i => i.id !== id));
+    await deleteMediaItem(id);
+  };
+
   return (
     <div className="h-full flex flex-col p-4 md:p-6 overflow-hidden">
         {/* Filters & Header */}
@@ -278,6 +283,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                                             onEdit={() => openEditModal(item)} 
                                             onMoveLeft={item.status !== 'to_watch' ? () => handleMoveLeft(item) : undefined}
                                             onMoveRight={item.status !== 'completed' ? () => handleMoveRight(item) : undefined}
+                                            onDelete={() => handleDelete(item.id)}
                                         />
                                     ))}
                                     {colItems.length === 0 && (

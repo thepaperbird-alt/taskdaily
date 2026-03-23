@@ -55,7 +55,7 @@ export default function AddMediaModal({
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
             <div className="bg-[#F8F9FA] dark:bg-neutral-900 w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden border-2 border-dashed border-neutral-300 dark:border-neutral-700 animate-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-center p-6 border-b-2 border-dashed border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
-                    <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{editItem ? 'Edit Media' : 'Add to Watchlist'}</h2>
+                    <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{editItem ? 'Edit Media' : 'Add to Lists'}</h2>
                     <button onClick={onClose} className="p-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400">
                         <X size={20} />
                     </button>

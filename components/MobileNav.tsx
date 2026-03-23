@@ -7,7 +7,7 @@ export default function MobileNav({ activeTab }: { activeTab: string }) {
         { id: 'tasks', label: 'Tasks', icon: List, type: 'searchParams' },
         { id: 'dailies', label: 'Daily Notes', icon: Calendar, type: 'searchParams' },
         { id: 'hashtags', label: 'Topics', icon: Hash, type: 'searchParams' },
-        { id: 'watchlist', label: 'Watchlist', icon: Tv, type: 'route', href: '/watchlist' },
+        { id: 'watchlist', label: 'Lists', icon: Tv, type: 'route', href: '/watchlist' },
     ];
 
     return (
