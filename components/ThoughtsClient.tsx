@@ -10,6 +10,23 @@ function adjustHeight(el: HTMLTextAreaElement) {
     el.style.height = el.scrollHeight + 'px';
 }
 
+const bgColors = [
+    'border-l-pink-400 bg-pink-50',
+    'border-l-green-400 bg-green-50',
+    'border-l-yellow-400 bg-yellow-50/70',
+    'border-l-purple-400 bg-purple-50',
+    'border-l-blue-400 bg-blue-50',
+    'border-l-orange-400 bg-orange-50'
+];
+
+function getColorClass(id: string) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return bgColors[Math.abs(hash) % bgColors.length];
+}
+
 export default function ThoughtsClient({ initialThoughts }: { initialThoughts: ThoughtItem[] }) {
     const [thoughts, setThoughts] = useState<ThoughtItem[]>(initialThoughts);
     const [isAdding, setIsAdding] = useState(false);
@@ -98,8 +115,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
 
     return (
         <div className="h-full flex flex-col p-4 md:p-6 overflow-hidden">
-            <div className="flex items-center justify-between mb-4 md:mb-6 shrink-0">
-                <h1 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">Thoughts</h1>
+            <div className="flex items-center justify-end mb-4 md:mb-6 shrink-0">
                 <button 
                     onClick={() => setIsAdding(true)}
                     className="btn btn-primary flex items-center gap-2"
@@ -115,101 +131,105 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                     columnClassName="pl-4 bg-clip-padding"
                 >
                     {isAdding && (
-                        <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-4 mb-4 relative flex flex-col group transition-all">
-                            <textarea
-                                ref={newTextareaRef}
-                                value={newThoughtStr}
-                                onChange={(e) => {
-                                    setNewThoughtStr(e.target.value);
-                                    adjustHeight(e.target);
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleAdd();
-                                    }
-                                    if (e.key === 'Escape') {
-                                        setIsAdding(false);
-                                        setNewThoughtStr('');
-                                    }
-                                }}
-                                placeholder="What's on your mind?"
-                                className="w-full bg-transparent border-none focus:ring-0 resize-none text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400"
-                                rows={2}
-                            />
-                            <div className="flex justify-end gap-2 mt-2">
-                                <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors" onClick={() => setIsAdding(false)}>
-                                    <X size={16} />
-                                </button>
-                                <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors" onClick={handleAdd}>
-                                    <Check size={16} />
-                                </button>
+                        <div className="relative rounded-xl border-2 border-dashed border-neutral-300 bg-white dark:bg-neutral-900 p-2.5 flex flex-col gap-2 mb-4 font-mono shadow-sm">
+                            <div className="flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative border-l-neutral-400 bg-neutral-50 dark:bg-neutral-800">
+                                <textarea
+                                    ref={newTextareaRef}
+                                    value={newThoughtStr}
+                                    onChange={(e) => {
+                                        setNewThoughtStr(e.target.value);
+                                        adjustHeight(e.target);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleAdd();
+                                        }
+                                        if (e.key === 'Escape') {
+                                            setIsAdding(false);
+                                            setNewThoughtStr('');
+                                        }
+                                    }}
+                                    placeholder="What's on your mind?"
+                                    className="w-full bg-transparent border-none focus:ring-0 resize-none text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 !outline-none font-bold text-xs leading-tight tracking-tight p-0"
+                                    rows={2}
+                                />
+                                <div className="flex justify-end gap-2 mt-2">
+                                    <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => setIsAdding(false)}>
+                                        <X size={14} />
+                                    </button>
+                                    <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors bg-white/50 rounded-md" onClick={handleAdd}>
+                                        <Check size={14} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {thoughts.map(thought => (
-                        <div key={thought.id} className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-4 mb-4 relative flex flex-col group transition-all hover:shadow-md">
-                            {editingId === thought.id ? (
-                                <>
-                                    <textarea
-                                        ref={editTextareaRef}
-                                        value={editStr}
-                                        onChange={(e) => {
-                                            setEditStr(e.target.value);
-                                            adjustHeight(e.target);
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                handleUpdate(thought.id);
-                                            }
-                                            if (e.key === 'Escape') {
-                                                setEditingId(null);
-                                            }
-                                        }}
-                                        className="w-full bg-transparent border-none focus:ring-0 resize-none text-neutral-800 dark:text-neutral-100"
-                                        rows={2}
-                                    />
-                                    <div className="flex justify-end gap-2 mt-2">
-                                        <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors" onClick={() => setEditingId(null)}>
-                                            <X size={16} />
-                                        </button>
-                                        <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors" onClick={() => handleUpdate(thought.id)}>
-                                            <Check size={16} />
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div 
-                                        className="text-neutral-800 dark:text-neutral-100 whitespace-pre-wrap cursor-pointer"
-                                        onClick={() => {
-                                            setEditingId(thought.id);
-                                            setEditStr(thought.content);
-                                        }}
-                                    >
-                                        {thought.content}
-                                    </div>
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm p-1 rounded-lg">
-                                        <button 
+                        <div key={thought.id} className="relative rounded-xl border-2 border-dashed border-neutral-300 bg-white dark:bg-neutral-900 p-2.5 flex flex-col gap-2 group transition-all font-mono shadow-sm hover:shadow-md mb-4">
+                            <div className={`flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative ${getColorClass(thought.id)} dark:!bg-neutral-800 dark:border-l-neutral-600`}>
+                                {editingId === thought.id ? (
+                                    <>
+                                        <textarea
+                                            ref={editTextareaRef}
+                                            value={editStr}
+                                            onChange={(e) => {
+                                                setEditStr(e.target.value);
+                                                adjustHeight(e.target);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault();
+                                                    handleUpdate(thought.id);
+                                                }
+                                                if (e.key === 'Escape') {
+                                                    setEditingId(null);
+                                                }
+                                            }}
+                                            className="w-full bg-transparent border-none focus:ring-0 resize-none text-neutral-800 dark:text-neutral-100 !outline-none font-bold text-xs leading-tight tracking-tight p-0"
+                                            rows={2}
+                                        />
+                                        <div className="flex justify-end gap-2 mt-2">
+                                            <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => setEditingId(null)}>
+                                                <X size={14} />
+                                            </button>
+                                            <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors bg-white/50 rounded-md" onClick={() => handleUpdate(thought.id)}>
+                                                <Check size={14} />
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div 
+                                            className="text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap cursor-pointer font-bold text-xs leading-tight tracking-tight"
                                             onClick={() => {
                                                 setEditingId(thought.id);
                                                 setEditStr(thought.content);
                                             }}
-                                            className="p-1.5 text-neutral-400 hover:text-blue-600 transition-colors rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700"
                                         >
-                                            <Edit2 size={14} />
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDelete(thought.id)}
-                                            className="p-1.5 text-neutral-400 hover:text-red-600 transition-colors rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </>
-                            )}
+                                            {thought.content}
+                                        </div>
+                                        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm p-1 rounded-lg">
+                                            <button 
+                                                onClick={() => {
+                                                    setEditingId(thought.id);
+                                                    setEditStr(thought.content);
+                                                }}
+                                                className="p-1 text-neutral-400 hover:text-blue-600 transition-colors rounded hover:bg-white/50"
+                                            >
+                                                <Edit2 size={12} />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(thought.id)}
+                                                className="p-1 text-red-400 hover:text-white hover:bg-red-500 rounded transition-colors"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </Masonry>
