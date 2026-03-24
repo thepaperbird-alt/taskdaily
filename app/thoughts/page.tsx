@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import MobileNav from '@/components/MobileNav';
 import Link from 'next/link';
-import { getWatchlist } from '@/actions/watchlist';
-import WatchlistClient from '@/components/WatchlistClient';
+import { getThoughts } from '@/actions/thoughts';
+import ThoughtsClient from '@/components/ThoughtsClient';
 
-export default async function WatchlistPage() {
-  const initialMedia = await getWatchlist();
+export default async function ThoughtsPage() {
+  const initialThoughts = await getThoughts();
 
   return (
     <main className="h-[100dvh] flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
@@ -16,8 +16,8 @@ export default async function WatchlistPage() {
         </div>
         <div className="hidden md:flex items-center gap-6">
           <Link href="/" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors">Tasks</Link>
-          <Link href="/watchlist" className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Lists</Link>
-          <Link href="/thoughts" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors">Thoughts</Link>
+           <Link href="/watchlist" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors">Lists</Link>
+          <Link href="/thoughts" className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Thoughts</Link>
         </div>
         <div className="hidden md:flex items-center gap-4">
             <div className="w-16"></div> {/* Spacer to balance logo */}
@@ -26,11 +26,11 @@ export default async function WatchlistPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden relative bg-[#F8F9FA] dark:bg-neutral-950">
-          <WatchlistClient initialMedia={initialMedia} />
+          <ThoughtsClient initialThoughts={initialThoughts} />
       </div>
 
       {/* Mobile Nav */}
-      <MobileNav activeTab="watchlist" />
+      <MobileNav activeTab="thoughts" />
     </main>
   );
 }

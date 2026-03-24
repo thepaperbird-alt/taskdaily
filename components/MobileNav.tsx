@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { List, Calendar, Hash, Tv } from 'lucide-react';
+import { List, Calendar, Hash, Tv, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function MobileNav({ activeTab }: { activeTab: string }) {
@@ -8,6 +8,7 @@ export default function MobileNav({ activeTab }: { activeTab: string }) {
         { id: 'dailies', label: 'Daily Notes', icon: Calendar, type: 'searchParams' },
         { id: 'hashtags', label: 'Topics', icon: Hash, type: 'searchParams' },
         { id: 'watchlist', label: 'Lists', icon: Tv, type: 'route', href: '/watchlist' },
+        { id: 'thoughts', label: 'Thoughts', icon: Lightbulb, type: 'route', href: '/thoughts' },
     ];
 
     return (
