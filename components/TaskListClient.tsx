@@ -78,8 +78,8 @@ export default function TaskListClient({ tasks, allTags }: { tasks: Task[], allT
                     if (a.completed && !b.completed) return 1;
                     if (!a.completed && b.completed) return -1;
 
-                    const indexA = orderMap.has(a.id) ? orderMap.get(a.id) : Infinity;
-                    const indexB = orderMap.has(b.id) ? orderMap.get(b.id) : Infinity;
+                    const indexA = orderMap.has(a.id) ? orderMap.get(a.id) : -1;
+                    const indexB = orderMap.has(b.id) ? orderMap.get(b.id) : -1;
                     if (indexA !== indexB) return indexA - indexB;
                     return 0; // Keep original relative order for new tasks
                 });

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ThoughtItem, addThought, updateThought, deleteThought } from '@/actions/thoughts';
 import { Plus, Trash2, Edit2, X, Check } from 'lucide-react';
 import Masonry from 'react-masonry-css';
+import { format } from 'date-fns';
 
 function adjustHeight(el: HTMLTextAreaElement) {
     el.style.height = 'auto';
@@ -16,13 +17,26 @@ const bgColors = [
     'border-l-yellow-400 bg-yellow-50/70',
     'border-l-purple-400 bg-purple-50',
     'border-l-blue-400 bg-blue-50',
-    'border-l-orange-400 bg-orange-50'
+    'border-l-orange-400 bg-orange-50',
+    'border-l-cyan-400 bg-cyan-50',
+    'border-l-rose-400 bg-rose-50',
+    'border-l-amber-400 bg-amber-50',
+    'border-l-indigo-400 bg-indigo-50',
+    'border-l-teal-400 bg-teal-50',
+    'border-l-lime-400 bg-lime-50'
 ];
 
 function getColorClass(id: string) {
+    if (id.startsWith('temp-')) {
+        // For new items, pick a truly random color from the list
+        const randomIndex = Math.floor(Math.random() * bgColors.length);
+        return bgColors[randomIndex];
+    }
+    // For existing items, use a better hash to distribute colors
     let hash = 0;
     for (let i = 0; i < id.length; i++) {
         hash = id.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash; // Convert to 32bit integer
     }
     return bgColors[Math.abs(hash) % bgColors.length];
 }
@@ -202,13 +216,16 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                 ) : (
                                     <>
                                         <div 
-                                            className="text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap cursor-pointer font-bold text-xs leading-tight tracking-tight"
+                                            className="text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap cursor-pointer font-bold text-xs leading-tight tracking-tight mb-2"
                                             onClick={() => {
                                                 setEditingId(thought.id);
                                                 setEditStr(thought.content);
                                             }}
                                         >
                                             {thought.content}
+                                        </div>
+                                        <div className="text-[10px] text-neutral-400 font-medium">
+                                            {format(new Date(thought.created_at), 'MMM d, h:mm a')}
                                         </div>
                                         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm p-1 rounded-lg">
                                             <button 

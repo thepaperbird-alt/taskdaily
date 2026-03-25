@@ -17,7 +17,6 @@ export async function getThoughts() {
     const { data, error } = await supabase
         .from('td_thoughts')
         .select('*')
-        .order('order_index', { ascending: true })
         .order('created_at', { ascending: false });
 
     if (error) {

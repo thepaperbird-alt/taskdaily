@@ -66,15 +66,15 @@ export async function addMediaItem(data: {
         }
     }
 
-    // Get max order index for the status column
+    // Get min order index for the status column to put new items at the top
     const { data: existing } = await supabase
         .from('td_media')
         .select('order_index')
         .eq('status', data.status)
-        .order('order_index', { ascending: false })
+        .order('order_index', { ascending: true })
         .limit(1);
 
-    const nextOrder = existing && existing.length > 0 ? existing[0].order_index + 1024 : 1024;
+    const nextOrder = existing && existing.length > 0 ? existing[0].order_index - 1024 : 1024;
 
     const { error } = await supabase
         .from('td_media')

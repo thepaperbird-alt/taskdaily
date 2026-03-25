@@ -192,7 +192,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
 
   const updateItemStatus = async (item: MediaItem, newStatus: string) => {
     const overItems = items.filter(i => i.status === newStatus).sort((a,b) => a.order_index - b.order_index);
-    const newOrderIndex = overItems.length > 0 ? overItems[overItems.length - 1].order_index + 1024 : 1024;
+    const newOrderIndex = overItems.length > 0 ? overItems[0].order_index - 1024 : 1024;
 
     const updatedItem = { ...item, status: newStatus as any, order_index: newOrderIndex };
 
