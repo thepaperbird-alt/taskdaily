@@ -7,6 +7,7 @@ export type ThoughtItem = {
     id: string;
     user_id: string;
     content: string;
+    color?: string;
     order_index: number;
     created_at: string;
     updated_at: string;
@@ -26,7 +27,7 @@ export async function getThoughts() {
     return data as ThoughtItem[];
 }
 
-export async function addThought(content: string) {
+export async function addThought(content: string, color?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
@@ -45,6 +46,7 @@ export async function addThought(content: string) {
         .insert({
             user_id: user.id,
             content,
+            color,
             order_index: nextOrder
         })
         .select()

@@ -26,9 +26,14 @@ const bgColors = [
     'border-l-lime-400 bg-lime-50'
 ];
 
-function getColorClass(id: string) {
+const selectableColors = bgColors.slice(0, 6);
+
+function getColorClass(thought: ThoughtItem) {
+    if (thought.color) return thought.color;
+    
+    const id = thought.id;
     if (id.startsWith('temp-')) {
-        // For new items, pick a truly random color from the list
+        // For new items without color, pick a truly random color from the list
         const randomIndex = Math.floor(Math.random() * bgColors.length);
         return bgColors[randomIndex];
     }
@@ -45,8 +50,10 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
     const [thoughts, setThoughts] = useState<ThoughtItem[]>(initialThoughts);
     const [isAdding, setIsAdding] = useState(false);
     const [newThoughtStr, setNewThoughtStr] = useState('');
+    const [selectedColor, setSelectedColor] = useState<string>(selectableColors[0]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editStr, setEditStr] = useState('');
+    const [editColor, setEditColor] = useState<string | null>(null);
     const newTextareaRef = useRef<HTMLTextAreaElement>(null);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -79,6 +86,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
             id: tempId,
             user_id: 'temp',
             content: newThoughtStr.trim(),
+            color: selectedColor,
             order_index: 0,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -87,9 +95,10 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
         setThoughts(prev => [newThought, ...prev]);
         setIsAdding(false);
         setNewThoughtStr('');
+        setSelectedColor(selectableColors[0]);
 
         try {
-            await addThought(newThought.content);
+            await addThought(newThought.content, selectedColor);
         } catch (error) {
             console.error(error);
             // Revert on error could be implemented here
@@ -99,11 +108,12 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
     const handleUpdate = async (id: string) => {
         if (!editStr.trim()) return;
 
-        setThoughts(prev => prev.map(t => t.id === id ? { ...t, content: editStr.trim() } : t));
+        setThoughts(prev => prev.map(t => t.id === id ? { ...t, content: editStr.trim(), color: editColor || t.color } : t));
         setEditingId(null);
+        setEditColor(null);
 
         try {
-            await updateThought(id, { content: editStr.trim() });
+            await updateThought(id, { content: editStr.trim(), color: editColor || undefined });
         } catch (error) {
             console.error(error);
         }
@@ -146,7 +156,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                 >
                     {isAdding && (
                         <div className="relative rounded-xl border-2 border-dashed border-neutral-300 bg-white dark:bg-neutral-900 p-2.5 flex flex-col gap-2 mb-4 font-mono shadow-sm">
-                            <div className="flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative border-l-neutral-400 bg-neutral-50 dark:bg-neutral-800">
+                            <div className={`flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative ${selectedColor} dark:!bg-neutral-800 dark:border-l-neutral-600`}>
                                 <textarea
                                     ref={newTextareaRef}
                                     value={newThoughtStr}
@@ -162,19 +172,35 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                         if (e.key === 'Escape') {
                                             setIsAdding(false);
                                             setNewThoughtStr('');
+                                            setSelectedColor(selectableColors[0]);
                                         }
                                     }}
                                     placeholder="What's on your mind?"
                                     className="w-full bg-transparent border-none focus:ring-0 resize-none text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 !outline-none font-bold text-xs leading-tight tracking-tight p-0"
                                     rows={2}
                                 />
-                                <div className="flex justify-end gap-2 mt-2">
-                                    <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => setIsAdding(false)}>
-                                        <X size={14} />
-                                    </button>
-                                    <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors bg-white/50 rounded-md" onClick={handleAdd}>
-                                        <Check size={14} />
-                                    </button>
+                                <div className="flex items-center justify-between mt-2">
+                                    <div className="flex gap-1.5">
+                                        {selectableColors.map((color) => (
+                                            <button
+                                                key={color}
+                                                onClick={() => setSelectedColor(color)}
+                                                className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${color.split(' ')[0].replace('border-l', 'bg')} ${selectedColor === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => {
+                                            setIsAdding(false);
+                                            setNewThoughtStr('');
+                                            setSelectedColor(selectableColors[0]);
+                                        }}>
+                                            <X size={14} />
+                                        </button>
+                                        <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors bg-white/50 rounded-md" onClick={handleAdd}>
+                                            <Check size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -182,7 +208,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
 
                     {thoughts.map(thought => (
                         <div key={thought.id} className="relative rounded-xl border-2 border-dashed border-neutral-300 bg-white dark:bg-neutral-900 p-2.5 flex flex-col gap-2 group transition-all font-mono shadow-sm hover:shadow-md mb-4">
-                            <div className={`flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative ${getColorClass(thought.id)} dark:!bg-neutral-800 dark:border-l-neutral-600`}>
+                            <div className={`flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative ${getColorClass(thought)} dark:!bg-neutral-800 dark:border-l-neutral-600`}>
                                 {editingId === thought.id ? (
                                     <>
                                         <textarea
@@ -204,13 +230,27 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                             className="w-full bg-transparent border-none focus:ring-0 resize-none text-neutral-800 dark:text-neutral-100 !outline-none font-bold text-xs leading-tight tracking-tight p-0"
                                             rows={2}
                                         />
-                                        <div className="flex justify-end gap-2 mt-2">
-                                            <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => setEditingId(null)}>
-                                                <X size={14} />
-                                            </button>
-                                            <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors bg-white/50 rounded-md" onClick={() => handleUpdate(thought.id)}>
-                                                <Check size={14} />
-                                            </button>
+                                        <div className="flex items-center justify-between mt-2">
+                                            <div className="flex gap-1.5">
+                                                {selectableColors.map((color) => (
+                                                    <button
+                                                        key={color}
+                                                        onClick={() => setEditColor(color)}
+                                                        className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${color.split(' ')[0].replace('border-l', 'bg')} ${(editColor || thought.color) === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => {
+                                                    setEditingId(null);
+                                                    setEditColor(null);
+                                                }}>
+                                                    <X size={14} />
+                                                </button>
+                                                <button className="p-1.5 text-blue-600 hover:text-blue-700 transition-colors bg-white/50 rounded-md" onClick={() => handleUpdate(thought.id)}>
+                                                    <Check size={14} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </>
                                 ) : (
@@ -220,6 +260,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                             onClick={() => {
                                                 setEditingId(thought.id);
                                                 setEditStr(thought.content);
+                                                setEditColor(thought.color || null);
                                             }}
                                         >
                                             {thought.content}
@@ -232,6 +273,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                                 onClick={() => {
                                                     setEditingId(thought.id);
                                                     setEditStr(thought.content);
+                                                    setEditColor(thought.color || null);
                                                 }}
                                                 className="p-1 text-neutral-400 hover:text-blue-600 transition-colors rounded hover:bg-white/50"
                                             >
