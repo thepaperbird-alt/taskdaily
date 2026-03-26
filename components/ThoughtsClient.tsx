@@ -28,6 +28,16 @@ const bgColors = [
 
 const selectableColors = bgColors.slice(0, 6);
 
+// Mapping for picker circle colors to ensure Tailwind v4 detects them
+const pickerBgClasses: Record<string, string> = {
+    'border-l-pink-400 bg-pink-50': 'bg-pink-400',
+    'border-l-green-400 bg-green-50': 'bg-green-400',
+    'border-l-yellow-400 bg-yellow-50/70': 'bg-yellow-400',
+    'border-l-purple-400 bg-purple-50': 'bg-purple-400',
+    'border-l-blue-400 bg-blue-50': 'bg-blue-400',
+    'border-l-orange-400 bg-orange-50': 'bg-orange-400',
+};
+
 function getColorClass(thought: ThoughtItem) {
     if (thought.color) return thought.color;
     
@@ -185,7 +195,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                             <button
                                                 key={color}
                                                 onClick={() => setSelectedColor(color)}
-                                                className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${color.split(' ')[0].replace('border-l', 'bg')} ${selectedColor === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
+                                                className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${pickerBgClasses[color]} ${selectedColor === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
                                             />
                                         ))}
                                     </div>
@@ -236,7 +246,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                                     <button
                                                         key={color}
                                                         onClick={() => setEditColor(color)}
-                                                        className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${color.split(' ')[0].replace('border-l', 'bg')} ${(editColor || thought.color) === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
+                                                        className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${pickerBgClasses[color]} ${(editColor || thought.color) === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
                                                     />
                                                 ))}
                                             </div>
