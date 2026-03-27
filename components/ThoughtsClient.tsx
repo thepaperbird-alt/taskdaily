@@ -39,21 +39,7 @@ const pickerBgClasses: Record<string, string> = {
 };
 
 function getColorClass(thought: ThoughtItem) {
-    if (thought.color) return thought.color;
-    
-    const id = thought.id;
-    if (id.startsWith('temp-')) {
-        // For new items without color, pick a truly random color from the list
-        const randomIndex = Math.floor(Math.random() * bgColors.length);
-        return bgColors[randomIndex];
-    }
-    // For existing items, use a better hash to distribute colors
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-        hash = id.charCodeAt(i) + ((hash << 5) - hash);
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return bgColors[Math.abs(hash) % bgColors.length];
+    return thought.color || bgColors[0];
 }
 
 export default function ThoughtsClient({ initialThoughts }: { initialThoughts: ThoughtItem[] }) {
@@ -108,10 +94,14 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
         setSelectedColor(selectableColors[0]);
 
         try {
-            await addThought(newThought.content, selectedColor);
+            const result = await addThought(newThought.content, selectedColor);
+            if (result) {
+                setThoughts(prev => prev.map(t => t.id === tempId ? result as ThoughtItem : t));
+            }
         } catch (error) {
             console.error(error);
-            // Revert on error could be implemented here
+            // Revert optimistic update on error
+            setThoughts(prev => prev.filter(t => t.id !== tempId));
         }
     };
 
