@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+export const dynamic = 'force-dynamic';
 import MobileNav from '@/components/MobileNav';
 import Link from 'next/link';
 import { getThoughts } from '@/actions/thoughts';

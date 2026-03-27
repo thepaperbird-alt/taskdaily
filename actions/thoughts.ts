@@ -25,7 +25,15 @@ export async function getThoughts() {
         console.error('Failed to get thoughts:', error);
         return [];
     }
-    return data as ThoughtItem[];
+
+    // Map color column to subject if it's a valid subject
+    const subjects = ["quotes", "to do", "plans", "braindump"];
+    const mappedData = (data || []).map(item => ({
+        ...item,
+        subject: item.color && subjects.includes(item.color) ? item.color : undefined
+    }));
+
+    return mappedData as ThoughtItem[];
 }
 
 export async function addThought(content: string, subject?: string) {
@@ -54,8 +62,16 @@ export async function addThought(content: string, subject?: string) {
         .single();
 
     if (error) throw new Error('Failed to add thought');
+    
+    // Map color to subject for the return value
+    const subjects = ["quotes", "to do", "plans", "braindump"];
+    const mappedData = {
+        ...data,
+        subject: data.color && subjects.includes(data.color) ? data.color : undefined
+    };
+
     revalidatePath('/thoughts');
-    return data;
+    return mappedData as ThoughtItem;
 }
 
 export async function updateThought(id: string, updates: Partial<ThoughtItem>) {

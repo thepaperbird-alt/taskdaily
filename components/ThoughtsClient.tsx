@@ -22,9 +22,20 @@ const subjectColors: Record<Subject, string> = {
 };
 
 function getColorClass(thought: ThoughtItem) {
-    // If it's one of our subjects, use the mapping. Otherwise fallback to default or stored color.
+    // Priority: 1. check if thought.color is a known subject
     const colorKey = (thought.color || 'braindump') as Subject;
-    return subjectColors[colorKey] || thought.color || subjectColors['braindump'];
+    if (subjectColors[colorKey]) return subjectColors[colorKey];
+    
+    // 2. check if thought.subject is set (from new getThoughts mapping)
+    if (thought.subject && subjectColors[thought.subject]) return subjectColors[thought.subject];
+
+    // 3. Fallback for legacy hex colors or unknown strings
+    // If it looks like a hex or doesn't look like a Tailwind class, return default
+    if (thought.color?.startsWith('#') || !thought.color?.includes(' ')) {
+        return subjectColors['braindump'];
+    }
+
+    return thought.color || subjectColors['braindump'];
 }
 
 export default function ThoughtsClient({ initialThoughts }: { initialThoughts: ThoughtItem[] }) {
@@ -246,7 +257,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                     <>
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-[9px] uppercase font-black text-neutral-400/70 tracking-tighter">
-                                                {(thought.color && subjects.includes(thought.color as Subject)) ? thought.color : 'thought'}
+                                                {(thought.subject || (thought.color && subjects.includes(thought.color as Subject))) ? (thought.subject || thought.color) : 'thought'}
                                             </span>
                                         </div>
                                         <div 
