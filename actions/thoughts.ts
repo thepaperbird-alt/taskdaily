@@ -8,6 +8,7 @@ export type ThoughtItem = {
     user_id: string;
     content: string;
     color?: string;
+    subject?: "quotes" | "to do" | "plans" | "braindump";
     order_index: number;
     created_at: string;
     updated_at: string;
@@ -27,7 +28,7 @@ export async function getThoughts() {
     return data as ThoughtItem[];
 }
 
-export async function addThought(content: string, color?: string) {
+export async function addThought(content: string, subject?: string) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
@@ -46,7 +47,7 @@ export async function addThought(content: string, color?: string) {
         .insert({
             user_id: user.id,
             content,
-            color,
+            color: subject, // Storing subject in color column for now to avoid schema change
             order_index: nextOrder
         })
         .select()
@@ -59,9 +60,17 @@ export async function addThought(content: string, color?: string) {
 
 export async function updateThought(id: string, updates: Partial<ThoughtItem>) {
     const supabase = await createClient();
+    
+    // Map subject to color column if updated
+    const dbUpdates: any = { ...updates, updated_at: new Date().toISOString() };
+    if (updates.subject) {
+        dbUpdates.color = updates.subject;
+        delete dbUpdates.subject;
+    }
+
     const { error } = await supabase
         .from('td_thoughts')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(dbUpdates)
         .eq('id', id);
 
     if (error) throw new Error('Failed to update thought');

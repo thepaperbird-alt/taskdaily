@@ -11,45 +11,30 @@ function adjustHeight(el: HTMLTextAreaElement) {
     el.style.height = el.scrollHeight + 'px';
 }
 
-const bgColors = [
-    'border-l-pink-400 bg-pink-50',
-    'border-l-green-400 bg-green-50',
-    'border-l-yellow-400 bg-yellow-50/70',
-    'border-l-purple-400 bg-purple-50',
-    'border-l-blue-400 bg-blue-50',
-    'border-l-orange-400 bg-orange-50',
-    'border-l-cyan-400 bg-cyan-50',
-    'border-l-rose-400 bg-rose-50',
-    'border-l-amber-400 bg-amber-50',
-    'border-l-indigo-400 bg-indigo-50',
-    'border-l-teal-400 bg-teal-50',
-    'border-l-lime-400 bg-lime-50'
-];
+const subjects = ["quotes", "to do", "plans", "braindump"] as const;
+type Subject = typeof subjects[number];
 
-const selectableColors = bgColors.slice(0, 6);
-
-// Mapping for picker circle colors to ensure Tailwind v4 detects them
-const pickerBgClasses: Record<string, string> = {
-    'border-l-pink-400 bg-pink-50': 'bg-pink-400',
-    'border-l-green-400 bg-green-50': 'bg-green-400',
-    'border-l-yellow-400 bg-yellow-50/70': 'bg-yellow-400',
-    'border-l-purple-400 bg-purple-50': 'bg-purple-400',
-    'border-l-blue-400 bg-blue-50': 'bg-blue-400',
-    'border-l-orange-400 bg-orange-50': 'bg-orange-400',
+const subjectColors: Record<Subject, string> = {
+    'quotes': 'border-l-pink-400 bg-pink-50',
+    'to do': 'border-l-green-400 bg-green-50',
+    'plans': 'border-l-yellow-400 bg-yellow-50/70',
+    'braindump': 'border-l-purple-400 bg-purple-50',
 };
 
 function getColorClass(thought: ThoughtItem) {
-    return thought.color || bgColors[0];
+    // If it's one of our subjects, use the mapping. Otherwise fallback to default or stored color.
+    const colorKey = (thought.color || 'braindump') as Subject;
+    return subjectColors[colorKey] || thought.color || subjectColors['braindump'];
 }
 
 export default function ThoughtsClient({ initialThoughts }: { initialThoughts: ThoughtItem[] }) {
     const [thoughts, setThoughts] = useState<ThoughtItem[]>(initialThoughts);
     const [isAdding, setIsAdding] = useState(false);
     const [newThoughtStr, setNewThoughtStr] = useState('');
-    const [selectedColor, setSelectedColor] = useState<string>(selectableColors[0]);
+    const [selectedSubject, setSelectedSubject] = useState<Subject>('braindump');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editStr, setEditStr] = useState('');
-    const [editColor, setEditColor] = useState<string | null>(null);
+    const [editSubject, setEditSubject] = useState<Subject | null>(null);
     const newTextareaRef = useRef<HTMLTextAreaElement>(null);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -82,7 +67,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
             id: tempId,
             user_id: 'temp',
             content: newThoughtStr.trim(),
-            color: selectedColor,
+            color: selectedSubject,
             order_index: 0,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -91,10 +76,10 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
         setThoughts(prev => [newThought, ...prev]);
         setIsAdding(false);
         setNewThoughtStr('');
-        setSelectedColor(selectableColors[0]);
+        setSelectedSubject('braindump');
 
         try {
-            const result = await addThought(newThought.content, selectedColor);
+            const result = await addThought(newThought.content, selectedSubject);
             if (result) {
                 setThoughts(prev => prev.map(t => t.id === tempId ? result as ThoughtItem : t));
             }
@@ -108,12 +93,12 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
     const handleUpdate = async (id: string) => {
         if (!editStr.trim()) return;
 
-        setThoughts(prev => prev.map(t => t.id === id ? { ...t, content: editStr.trim(), color: editColor || t.color } : t));
+        setThoughts(prev => prev.map(t => t.id === id ? { ...t, content: editStr.trim(), color: editSubject || t.color } : t));
         setEditingId(null);
-        setEditColor(null);
+        setEditSubject(null);
 
         try {
-            await updateThought(id, { content: editStr.trim(), color: editColor || undefined });
+            await updateThought(id, { content: editStr.trim(), subject: editSubject || undefined });
         } catch (error) {
             console.error(error);
         }
@@ -156,7 +141,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                 >
                     {isAdding && (
                         <div className="relative rounded-xl border-2 border-dashed border-neutral-300 bg-white dark:bg-neutral-900 p-2.5 flex flex-col gap-2 mb-4 font-mono shadow-sm">
-                            <div className={`flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative ${selectedColor} dark:!bg-neutral-800 dark:border-l-neutral-600`}>
+                            <div className={`flex-1 flex flex-col justify-center rounded-lg border-l-4 p-3 gap-1 relative ${subjectColors[selectedSubject]} dark:!bg-neutral-800 dark:border-l-neutral-600`}>
                                 <textarea
                                     ref={newTextareaRef}
                                     value={newThoughtStr}
@@ -172,7 +157,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                         if (e.key === 'Escape') {
                                             setIsAdding(false);
                                             setNewThoughtStr('');
-                                            setSelectedColor(selectableColors[0]);
+                                            setSelectedSubject('braindump');
                                         }
                                     }}
                                     placeholder="What's on your mind?"
@@ -180,20 +165,22 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                     rows={2}
                                 />
                                 <div className="flex items-center justify-between mt-2">
-                                    <div className="flex gap-1.5">
-                                        {selectableColors.map((color) => (
-                                            <button
-                                                key={color}
-                                                onClick={() => setSelectedColor(color)}
-                                                className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${pickerBgClasses[color]} ${selectedColor === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
-                                            />
-                                        ))}
+                                    <div className="flex items-center gap-2">
+                                        <select 
+                                            value={selectedSubject}
+                                            onChange={(e) => setSelectedSubject(e.target.value as Subject)}
+                                            className="bg-white/50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-0.5 text-[10px] uppercase font-bold text-neutral-600 dark:text-neutral-400 focus:outline-none"
+                                        >
+                                            {subjects.map(s => (
+                                                <option key={s} value={s}>{s}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="flex gap-2">
                                         <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => {
                                             setIsAdding(false);
                                             setNewThoughtStr('');
-                                            setSelectedColor(selectableColors[0]);
+                                            setSelectedSubject('braindump');
                                         }}>
                                             <X size={14} />
                                         </button>
@@ -231,19 +218,21 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                             rows={2}
                                         />
                                         <div className="flex items-center justify-between mt-2">
-                                            <div className="flex gap-1.5">
-                                                {selectableColors.map((color) => (
-                                                    <button
-                                                        key={color}
-                                                        onClick={() => setEditColor(color)}
-                                                        className={`w-4 h-4 rounded-full border border-neutral-300 transition-transform hover:scale-110 ${pickerBgClasses[color]} ${(editColor || thought.color) === color ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
-                                                    />
-                                                ))}
+                                            <div className="flex items-center gap-2">
+                                                <select 
+                                                    value={editSubject || (thought.color as Subject) || 'braindump'}
+                                                    onChange={(e) => setEditSubject(e.target.value as Subject)}
+                                                    className="bg-white/50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-0.5 text-[10px] uppercase font-bold text-neutral-600 dark:text-neutral-400 focus:outline-none"
+                                                >
+                                                    {subjects.map(s => (
+                                                        <option key={s} value={s}>{s}</option>
+                                                    ))}
+                                                </select>
                                             </div>
                                             <div className="flex gap-2">
                                                 <button className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors bg-white/50 rounded-md" onClick={() => {
                                                     setEditingId(null);
-                                                    setEditColor(null);
+                                                    setEditSubject(null);
                                                 }}>
                                                     <X size={14} />
                                                 </button>
@@ -255,12 +244,17 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                     </>
                                 ) : (
                                     <>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[9px] uppercase font-black text-neutral-400/70 tracking-tighter">
+                                                {(thought.color && subjects.includes(thought.color as Subject)) ? thought.color : 'thought'}
+                                            </span>
+                                        </div>
                                         <div 
                                             className="text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap cursor-pointer font-bold text-xs leading-tight tracking-tight mb-2"
                                             onClick={() => {
                                                 setEditingId(thought.id);
                                                 setEditStr(thought.content);
-                                                setEditColor(thought.color || null);
+                                                setEditSubject((thought.color as Subject) || 'braindump');
                                             }}
                                         >
                                             {thought.content}
@@ -273,7 +267,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                                 onClick={() => {
                                                     setEditingId(thought.id);
                                                     setEditStr(thought.content);
-                                                    setEditColor(thought.color || null);
+                                                    setEditSubject((thought.color as Subject) || 'braindump');
                                                 }}
                                                 className="p-1 text-neutral-400 hover:text-blue-600 transition-colors rounded hover:bg-white/50"
                                             >
