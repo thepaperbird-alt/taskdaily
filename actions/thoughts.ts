@@ -61,7 +61,11 @@ export async function addThought(content: string, subject?: string) {
         .select()
         .single();
 
-    if (error) throw new Error('Failed to add thought');
+    if (error) {
+        console.error('[addThought] Supabase insert error:', JSON.stringify(error, null, 2));
+        throw new Error('Failed to add thought: ' + error.message);
+    }
+
     
     // Map color to subject for the return value
     const subjects = ["quotes", "to do", "plans", "braindump"];
