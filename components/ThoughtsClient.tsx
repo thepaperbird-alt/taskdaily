@@ -46,6 +46,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editStr, setEditStr] = useState('');
     const [editSubject, setEditSubject] = useState<Subject | null>(null);
+    const [saveError, setSaveError] = useState<string | null>(null);
     const newTextareaRef = useRef<HTMLTextAreaElement>(null);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -94,10 +95,14 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
             if (result) {
                 setThoughts(prev => prev.map(t => t.id === tempId ? result as ThoughtItem : t));
             }
-        } catch (error) {
-            console.error(error);
+            setSaveError(null);
+        } catch (error: any) {
+            console.error('[ThoughtsClient] addThought failed:', error);
             // Revert optimistic update on error
             setThoughts(prev => prev.filter(t => t.id !== tempId));
+            setSaveError(error?.message || 'Failed to save thought. Please try again.');
+            // Auto-clear error after 6 seconds
+            setTimeout(() => setSaveError(null), 6000);
         }
     };
 
@@ -135,6 +140,12 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
 
     return (
         <div className="h-full flex flex-col p-4 md:p-6 overflow-hidden">
+            {saveError && (
+                <div className="mb-3 shrink-0 bg-red-50 border border-red-200 text-red-700 text-xs font-mono rounded-lg px-4 py-2 flex items-center justify-between">
+                    <span>⚠️ {saveError}</span>
+                    <button onClick={() => setSaveError(null)} className="ml-3 text-red-400 hover:text-red-600">✕</button>
+                </div>
+            )}
             <div className="flex items-center justify-end mb-4 md:mb-6 shrink-0">
                 <button 
                     onClick={() => setIsAdding(true)}

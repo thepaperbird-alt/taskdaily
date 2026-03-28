@@ -14,6 +14,15 @@ export type ThoughtItem = {
     updated_at: string;
 };
 
+const VALID_SUBJECTS = ["quotes", "to do", "plans", "braindump"] as const;
+
+function mapDbRowToThought(item: any): ThoughtItem {
+    return {
+        ...item,
+        subject: item.color && VALID_SUBJECTS.includes(item.color) ? item.color : undefined,
+    };
+}
+
 export async function getThoughts() {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -22,24 +31,32 @@ export async function getThoughts() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Failed to get thoughts:', error);
+        console.error('[getThoughts] Failed to get thoughts:', JSON.stringify(error, null, 2));
         return [];
     }
 
-    // Map color column to subject if it's a valid subject
-    const subjects = ["quotes", "to do", "plans", "braindump"];
-    const mappedData = (data || []).map(item => ({
-        ...item,
-        subject: item.color && subjects.includes(item.color) ? item.color : undefined
-    }));
-
-    return mappedData as ThoughtItem[];
+    return (data || []).map(mapDbRowToThought) as ThoughtItem[];
 }
 
 export async function addThought(content: string, subject?: string) {
     const supabase = await createClient();
+
+    // Try getUser first, fall back to getSession for broader compatibility
+    let userId: string | null = null;
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (user) {
+        userId = user.id;
+    } else {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            userId = session.user.id;
+        }
+    }
+
+    if (!userId) {
+        console.error('[addThought] No authenticated user found');
+        throw new Error('User not authenticated');
+    }
 
     // Get max order index
     const { data: existing } = await supabase
@@ -50,13 +67,16 @@ export async function addThought(content: string, subject?: string) {
 
     const nextOrder = existing && existing.length > 0 ? existing[0].order_index + 1024 : 1024;
 
+    // Validate subject
+    const colorToStore = subject && VALID_SUBJECTS.includes(subject as any) ? subject : null;
+
     const { error, data } = await supabase
         .from('td_thoughts')
         .insert({
-            user_id: user.id,
+            user_id: userId,
             content,
-            color: subject, // Storing subject in color column for now to avoid schema change
-            order_index: nextOrder
+            color: colorToStore,
+            order_index: nextOrder,
         })
         .select()
         .single();
@@ -66,34 +86,43 @@ export async function addThought(content: string, subject?: string) {
         throw new Error('Failed to add thought: ' + error.message);
     }
 
-    
-    // Map color to subject for the return value
-    const subjects = ["quotes", "to do", "plans", "braindump"];
-    const mappedData = {
-        ...data,
-        subject: data.color && subjects.includes(data.color) ? data.color : undefined
-    };
+    if (!data) {
+        console.error('[addThought] Insert returned no data — possible RLS SELECT block');
+        // Still succeed with a synthetic record so the optimistic UI stays
+        throw new Error('Thought may have saved but could not be confirmed. Please refresh.');
+    }
 
     revalidatePath('/thoughts');
-    return mappedData as ThoughtItem;
+    return mapDbRowToThought(data) as ThoughtItem;
 }
 
 export async function updateThought(id: string, updates: Partial<ThoughtItem>) {
     const supabase = await createClient();
-    
-    // Map subject to color column if updated
-    const dbUpdates: any = { ...updates, updated_at: new Date().toISOString() };
-    if (updates.subject) {
-        dbUpdates.color = updates.subject;
-        delete dbUpdates.subject;
+
+    // Build DB-safe update object — drop TypeScript-only 'subject' field
+    const { subject, ...restUpdates } = updates;
+    const dbUpdates: any = {
+        ...restUpdates,
+        updated_at: new Date().toISOString(),
+    };
+
+    // Map subject -> color column if provided
+    if (subject !== undefined) {
+        dbUpdates.color = VALID_SUBJECTS.includes(subject as any) ? subject : null;
     }
+
+    // Ensure 'subject' is never sent as a DB column
+    delete dbUpdates.subject;
 
     const { error } = await supabase
         .from('td_thoughts')
         .update(dbUpdates)
         .eq('id', id);
 
-    if (error) throw new Error('Failed to update thought');
+    if (error) {
+        console.error('[updateThought] Supabase update error:', JSON.stringify(error, null, 2));
+        throw new Error('Failed to update thought: ' + error.message);
+    }
     revalidatePath('/thoughts');
 }
 
@@ -104,22 +133,25 @@ export async function deleteThought(id: string) {
         .delete()
         .eq('id', id);
 
-    if (error) throw new Error('Failed to delete thought');
+    if (error) {
+        console.error('[deleteThought] Supabase delete error:', JSON.stringify(error, null, 2));
+        throw new Error('Failed to delete thought: ' + error.message);
+    }
     revalidatePath('/thoughts');
 }
 
 export async function updateThoughtsOrder(updates: { id: string, order_index: number }[]) {
-     const supabase = await createClient();
-     
-     for (const update of updates) {
-         await supabase
+    const supabase = await createClient();
+
+    for (const update of updates) {
+        await supabase
             .from('td_thoughts')
-            .update({ 
+            .update({
                 order_index: update.order_index,
                 updated_at: new Date().toISOString()
             })
             .eq('id', update.id);
-     }
-     
-     revalidatePath('/thoughts');
+    }
+
+    revalidatePath('/thoughts');
 }
