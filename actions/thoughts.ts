@@ -18,8 +18,14 @@ const VALID_SUBJECTS = ["quotes", "to do", "plans", "braindump"] as const;
 
 function mapDbRowToThought(item: any): ThoughtItem {
     return {
-        ...item,
-        subject: item.color && VALID_SUBJECTS.includes(item.color) ? item.color : undefined,
+        id: item.id || '',
+        user_id: item.user_id || '',
+        content: item.content || '',
+        color: item.color || undefined,
+        subject: item.color && VALID_SUBJECTS.includes(item.color as any) ? (item.color as any) : undefined,
+        order_index: typeof item.order_index === 'number' ? item.order_index : 0,
+        created_at: item.created_at || new Date().toISOString(),
+        updated_at: item.updated_at || new Date().toISOString(),
     };
 }
 

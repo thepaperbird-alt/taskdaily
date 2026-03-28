@@ -11,6 +11,17 @@ function adjustHeight(el: HTMLTextAreaElement) {
     el.style.height = el.scrollHeight + 'px';
 }
 
+function formatDateSafe(dateStr: string | null | undefined) {
+    if (!dateStr) return 'Unknown date';
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return 'Invalid date';
+        return format(date, 'MMM d, h:mm a');
+    } catch (err) {
+        return 'Date error';
+    }
+}
+
 const subjects = ["quotes", "to do", "plans", "braindump"] as const;
 type Subject = typeof subjects[number];
 
@@ -282,7 +293,7 @@ export default function ThoughtsClient({ initialThoughts }: { initialThoughts: T
                                             {thought.content}
                                         </div>
                                         <div className="text-[10px] text-neutral-400 font-medium">
-                                            {format(new Date(thought.created_at), 'MMM d, h:mm a')}
+                                            {formatDateSafe(thought.created_at)}
                                         </div>
                                         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm p-1 rounded-lg">
                                             <button 
