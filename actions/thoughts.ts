@@ -23,19 +23,24 @@ function mapDbRowToThought(item: any): ThoughtItem {
     };
 }
 
-export async function getThoughts() {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-        .from('td_thoughts')
-        .select('*')
-        .order('created_at', { ascending: false });
+export async function getThoughts(): Promise<ThoughtItem[]> {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from('td_thoughts')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (error) {
-        console.error('[getThoughts] Failed to get thoughts:', JSON.stringify(error, null, 2));
+        if (error) {
+            console.error('[getThoughts] Supabase query error:', JSON.stringify(error, null, 2));
+            return [];
+        }
+
+        return (data || []).map(mapDbRowToThought) as ThoughtItem[];
+    } catch (err) {
+        console.error('[getThoughts] Unexpected error:', err);
         return [];
     }
-
-    return (data || []).map(mapDbRowToThought) as ThoughtItem[];
 }
 
 export async function addThought(content: string, subject?: string) {
