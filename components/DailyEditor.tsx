@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Plus, List, ListOrdered, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, List, ListOrdered, Strikethrough, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, isToday, addDays, subDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { createOrUpdateDaily, addDailyTask } from '@/actions/dailies';
@@ -137,7 +137,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         }, 1000);
     };
 
-    const insertFormatting = (type: 'bullet' | 'number') => {
+    const insertFormatting = (type: 'bullet' | 'number' | 'strikethrough') => {
         if (!textareaRef.current) return;
 
         const start = textareaRef.current.selectionStart;
@@ -145,24 +145,50 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         const text = textareaRef.current.value;
         const before = text.substring(0, start);
         const after = text.substring(end);
+        const selected = text.substring(start, end);
 
-        let visualPrefix = '';
-        if (type === 'bullet') visualPrefix = '- ';
-        if (type === 'number') visualPrefix = '1. ';
+        let newText;
+        let newSelectionStart, newSelectionEnd;
 
-        // If not at start of line, add newline
-        const isStartOfLine = start === 0 || text[start - 1] === '\n';
-        const prefix = isStartOfLine ? visualPrefix : `\n${visualPrefix}`;
+        if (type === 'strikethrough') {
+            const STRIKE_CHAR = '\u0336';
+            const isStruck = selected.includes(STRIKE_CHAR);
 
-        const newText = before + prefix + after;
+            if (isStruck) {
+                // Remove all strike characters from the selection
+                const unstruck = selected.split(STRIKE_CHAR).join('');
+                newText = before + unstruck + after;
+                newSelectionStart = start;
+                newSelectionEnd = start + unstruck.length;
+            } else {
+                // Apply strike character after every character
+                const struck = selected.split('').map(char => char + STRIKE_CHAR).join('');
+                const insertText = struck.length > 0 ? struck : STRIKE_CHAR + STRIKE_CHAR; // placeholder if empty
+                newText = before + insertText + after;
+                newSelectionStart = start;
+                newSelectionEnd = start + insertText.length;
+            }
+        } else {
+            let visualPrefix = '';
+            if (type === 'bullet') visualPrefix = '- ';
+            if (type === 'number') visualPrefix = '1. ';
+
+            // If not at start of line, add newline
+            const isStartOfLine = start === 0 || text[start - 1] === '\n';
+            const prefix = isStartOfLine ? visualPrefix : `\n${visualPrefix}`;
+
+            newText = before + prefix + selected + after;
+            newSelectionStart = start + prefix.length;
+            newSelectionEnd = end + prefix.length;
+        }
 
         setContent(newText);
 
-        // Focus back and set cursor
+        // Focus back and set cursor/selection
         setTimeout(() => {
             if (textareaRef.current) {
                 textareaRef.current.focus();
-                textareaRef.current.setSelectionRange(start + prefix.length, start + prefix.length);
+                textareaRef.current.setSelectionRange(newSelectionStart, newSelectionEnd);
             }
         }, 0);
 
@@ -287,6 +313,9 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                     </button>
                     <button onClick={() => insertFormatting('number')} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded text-neutral-500" title="Numbered List">
                         <ListOrdered size={14} />
+                    </button>
+                    <button onClick={() => insertFormatting('strikethrough')} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded text-neutral-500" title="Strikethrough">
+                        <Strikethrough size={14} />
                     </button>
                     <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-700 mx-1"></div>
                     {daily?.id && <TagSelector dailyId={daily.id} assignedTags={daily.tags || []} />}
