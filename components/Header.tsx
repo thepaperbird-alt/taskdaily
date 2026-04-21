@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import ClockWidget from './ClockWidget';
 
 interface HeaderProps {
   activeTab: 'tasks' | 'watchlist' | 'thoughts' | 'wallet';
@@ -38,7 +39,7 @@ export default function Header({ activeTab, children }: HeaderProps) {
         ))}
       </div>
       <div className="hidden md:flex items-center gap-4">
-        {children || <div className="w-16"></div>}
+        {children || <ClockWidget />}
       </div>
     </header>
   );

@@ -26,9 +26,7 @@ export default async function Page({
   return (
     <main className="h-[100dvh] flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
       {/* Header */}
-      <Header activeTab="tasks">
-        <button className="btn btn-primary text-sm shadow-md">+ New Task</button>
-      </Header>
+      <Header activeTab="tasks" />
 
       {/* Content */}
       <div className="flex-1 overflow-hidden relative">
