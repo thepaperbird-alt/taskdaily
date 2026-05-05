@@ -7,6 +7,7 @@ import TaskItem from './TaskItem';
 import { Task } from '@/lib/types';
 import { useHashtagAutocomplete } from './useHashtagAutocomplete';
 import HashtagDropdown from './HashtagDropdown';
+import AppleCalendarEvents from './AppleCalendarEvents';
 
 // DnD Imports
 import {
@@ -177,6 +178,7 @@ export default function TaskListClient({ tasks, allTags }: { tasks: Task[], allT
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800 pb-20">
+                <AppleCalendarEvents />
                 {orderedTasks.length === 0 ? (
                     <div className="text-center text-neutral-400 mt-10 text-sm">
                         No tasks yet. Add one above!

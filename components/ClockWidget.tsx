@@ -27,7 +27,7 @@ export default function ClockWidget() {
   return (
     <div className="flex items-center gap-3 bg-white/50 dark:bg-neutral-800/50 backdrop-blur-sm px-3 py-1.5 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-sm transition-all hover:bg-neutral-50 dark:hover:bg-neutral-800">
       {/* Date and Digital Time */}
-      <div className="flex flex-col items-end justify-center">
+      <div className="hidden md:flex flex-col items-end justify-center">
         <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 leading-tight">
           {format(time, 'hh:mm a')}
         </span>
