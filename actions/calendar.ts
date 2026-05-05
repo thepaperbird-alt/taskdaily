@@ -14,6 +14,9 @@ export interface CalendarEvent {
 }
 
 export async function getAppleCalendarEvents(): Promise<CalendarEvent[]> {
+    if (process.platform !== 'darwin') {
+        return [];
+    }
     const appleScript = `
         set currentDate to (current date)
         set hours of currentDate to 0
