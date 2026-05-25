@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Plus, List, ListOrdered, Strikethrough, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { List, ListOrdered, Strikethrough, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, isToday, addDays, subDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { createOrUpdateDaily, addDailyTask } from '@/actions/dailies';
-import { Daily, Task } from '@/lib/types';
-import TaskItem from './TaskItem';
+import { createOrUpdateDaily } from '@/actions/dailies';
+import { Daily } from '@/lib/types';
 import TagSelector from './TagSelector';
 import { useHashtagAutocomplete } from './useHashtagAutocomplete';
 import HashtagDropdown from './HashtagDropdown';
@@ -18,8 +17,7 @@ import MiniCalendar from './MiniCalendar';
 export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; date: Date; allTags?: any[] }) {
     const [activeTab, setActiveTab] = useState<'daily' | 'hashtags'>('daily');
     const [content, setContent] = useState(daily?.content || '');
-    const [tasks, setTasks] = useState<Task[]>(daily?.tasks || []);
-    const [isAddingTask, setIsAddingTask] = useState(false);
+
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
@@ -42,18 +40,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         selectTag: selectContentTag
     } = useHashtagAutocomplete(content, setContent, allTags || []);
 
-    const taskInputRef = useRef<HTMLInputElement>(null);
-    const [taskInputValue, setTaskInputValue] = useState("");
-    // Autocomplete for task input
-    const {
-        showDropdown: showTaskDropdown,
-        filteredTags: taskFilteredTags,
-        selectedIndex: taskSelectedIndex,
-        handleKeyDown: handleTaskKeyDown,
-        handleChange: handleTaskChangeWrapper,
-        handleSelect: handleTaskSelect,
-        selectTag: selectTaskTag
-    } = useHashtagAutocomplete(taskInputValue, setTaskInputValue, allTags || []);
+
 
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -61,7 +48,6 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     // This fixes the "auto-delete" bug caused by revalidation race conditions
     useEffect(() => {
         setContent(daily?.content || '');
-        setTasks(daily?.tasks || []);
     }, [daily?.entry_date]); // Only update content if we switch days
 
     useEffect(() => {
@@ -94,19 +80,6 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
         handleContentKeyDown(e);
     };
 
-    const handleAddTask = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const title = taskInputValue;
-        if (!title?.trim()) return;
-
-        try {
-            await addDailyTask(daily?.id || '', title, format(date, 'yyyy-MM-dd'));
-            setTaskInputValue('');
-            setIsAddingTask(false);
-        } catch (err) {
-            console.error("Failed to add task", err);
-        }
-    };
 
     const handleAddNote = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -358,63 +331,6 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                             }, 100);
                         }}
                     />
-                </div>
-
-                {/* Inline Tasks Section */}
-                <div className="border-t border-neutral-100 dark:border-neutral-800 p-3 md:p-4 bg-neutral-50/30 dark:bg-neutral-900/30">
-                    <div className="mb-2 flex items-center justify-between">
-                        <span className="text-xs font-medium text-neutral-500 uppercase tracking-widest">Linked Tasks</span>
-                        {!isAddingTask && (
-                            <button
-                                onClick={() => setIsAddingTask(true)}
-                                className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                            >
-                                <Plus size={14} /> Add task
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="space-y-1">
-                        {tasks.map(task => (
-                            <TaskItem key={task.id} task={task} />
-                        ))}
-                        {tasks.length === 0 && !isAddingTask && (
-                            <div className="text-xs text-neutral-400 italic">No tasks linked to this entry.</div>
-                        )}
-                    </div>
-
-                    {isAddingTask && (
-                        <form onSubmit={handleAddTask} className="mt-2 flex gap-2 relative">
-                            <div className="relative flex-1">
-                                <input
-                                    ref={taskInputRef}
-                                    type="text"
-                                    placeholder="New task..."
-                                    className="input text-xs py-1.5 h-auto font-mono w-full"
-                                    autoFocus
-                                    value={taskInputValue}
-                                    onChange={handleTaskChangeWrapper}
-                                    onKeyDown={handleTaskKeyDown}
-                                    onSelect={handleTaskSelect}
-                                    autoComplete="off"
-                                />
-                                <HashtagDropdown
-                                    isOpen={showTaskDropdown}
-                                    tags={taskFilteredTags}
-                                    selectedIndex={taskSelectedIndex}
-                                    onSelect={selectTaskTag}
-                                />
-                            </div>
-                            <button type="submit" className="btn btn-primary text-xs py-1 px-3">Add</button>
-                            <button
-                                type="button"
-                                onClick={() => setIsAddingTask(false)}
-                                className="text-xs text-neutral-400 px-2"
-                            >
-                                Cancel
-                            </button>
-                        </form>
-                    )}
                 </div>
 
                 {/* Quick Add Note Section */}

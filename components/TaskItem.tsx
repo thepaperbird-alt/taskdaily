@@ -7,6 +7,14 @@ import { Task } from '@/lib/types';
 import { cn, stringToBgColor } from '@/lib/utils';
 import TagSelector from './TagSelector';
 import HashtagText from './HashtagText';
+import { format, isToday, isYesterday } from 'date-fns';
+
+function formatTaskDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    if (isToday(d)) return 'Today';
+    if (isYesterday(d)) return 'Yesterday';
+    return format(d, 'MMM d');
+}
 
 export default function TaskItem({ task }: { task: Task }) {
     const [completed, setCompleted] = useState(task.completed);
@@ -40,6 +48,7 @@ export default function TaskItem({ task }: { task: Task }) {
     if (isDeleting) return null;
 
     const bgColor = stringToBgColor(task.id);
+    const dateLabel = formatTaskDate(task.created_at);
 
     return (
         <div
@@ -58,19 +67,24 @@ export default function TaskItem({ task }: { task: Task }) {
                 {completed && <Check size={10} strokeWidth={3} />}
             </button>
 
-            <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden">
+            <div className="flex-1 min-w-0 overflow-hidden">
                 <div className={cn(
                     "text-xs transition-all truncate font-medium text-neutral-900",
                     completed && "text-neutral-500 line-through opacity-60"
                 )}>
                     <HashtagText text={task.title} />
                 </div>
-                <div className="shrink-0 opacity-70 hover:opacity-100 transition-opacity">
-                    <TagSelector
-                        taskId={task.id}
-                        assignedTags={task.tags || []}
-                        hideTagsInText={task.title}
-                    />
+                <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[9px] font-medium uppercase tracking-widest text-neutral-400/70 leading-none">
+                        {dateLabel}
+                    </span>
+                    <div className="shrink-0 opacity-70 hover:opacity-100 transition-opacity">
+                        <TagSelector
+                            taskId={task.id}
+                            assignedTags={task.tags || []}
+                            hideTagsInText={task.title}
+                        />
+                    </div>
                 </div>
             </div>
 
