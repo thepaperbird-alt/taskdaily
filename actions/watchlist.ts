@@ -13,7 +13,7 @@ export type MediaItem = {
     user_id: string;
     title: string;
     summary: string | null;
-    type: 'movie' | 'tv' | 'game' | 'gadget';
+    type: 'movie' | 'tv' | 'game' | 'gadget' | 'travel';
     status: 'to_watch' | 'current' | 'completed';
     platform: string | null;
     season: string | null;
@@ -40,7 +40,7 @@ export async function getWatchlist() {
 export async function addMediaItem(data: {
     title: string;
     summary?: string;
-    type: 'movie' | 'tv' | 'game' | 'gadget';
+    type: 'movie' | 'tv' | 'game' | 'gadget' | 'travel';
     status: 'to_watch' | 'current' | 'completed';
     platform?: string;
     season?: string;

@@ -14,7 +14,7 @@ export default function AddMediaModal({
 }) {
     const [title, setTitle] = useState(editItem?.title || '');
     const [summary, setSummary] = useState(editItem?.summary || '');
-    const [type, setType] = useState<'movie' | 'tv' | 'game' | 'gadget'>(editItem?.type || 'movie');
+    const [type, setType] = useState<'movie' | 'tv' | 'game' | 'gadget' | 'travel'>(editItem?.type || 'movie');
     const [platform, setPlatform] = useState(editItem?.platform || '');
     const [season, setSeason] = useState(editItem?.season || '');
     const [loading, setLoading] = useState(false);
@@ -83,19 +83,20 @@ export default function AddMediaModal({
                                 <button type="button" onClick={() => setType('tv')} className={cn("flex-1 px-2 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap", type === 'tv' ? "bg-black text-white" : "text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700")}>Show</button>
                                 <button type="button" onClick={() => setType('game')} className={cn("flex-1 px-2 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap", type === 'game' ? "bg-black text-white" : "text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700")}>Game</button>
                                 <button type="button" onClick={() => setType('gadget')} className={cn("flex-1 px-2 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap", type === 'gadget' ? "bg-black text-white" : "text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700")}>Gadget</button>
+                                <button type="button" onClick={() => setType('travel')} className={cn("flex-1 px-2 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap", type === 'travel' ? "bg-black text-white" : "text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700")}>Travel</button>
                             </div>
                         </div>
                         
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-                                {type === 'game' ? 'Platform' : type === 'gadget' ? 'Store' : 'Platform / Network'}
+                                {type === 'game' ? 'Platform' : type === 'gadget' ? 'Store' : type === 'travel' ? 'Destination' : 'Platform / Network'}
                             </label>
                             <input 
                                 type="text" 
                                 value={platform}
                                 onChange={(e) => setPlatform(e.target.value)}
                                 className="w-full p-2.5 rounded-xl border-2 border-neutral-200 focus:border-black dark:border-neutral-700 dark:bg-neutral-800 dark:text-white outline-none text-sm transition-all"
-                                placeholder={type === 'game' ? "PS5, PC, Switch..." : (type === 'gadget' ? "Amazon, BestBuy..." : "Netflix, HBO...")}
+                                placeholder={type === 'game' ? "PS5, PC, Switch..." : (type === 'gadget' ? "Amazon, BestBuy..." : (type === 'travel' ? "Bali, Tokyo, Iceland..." : "Netflix, HBO..."))}
                             />
                         </div>
                     </div>
