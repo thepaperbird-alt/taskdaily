@@ -5,6 +5,25 @@ import { Clock, Trash2, Edit3, Check, X, Info, Plus } from 'lucide-react';
 import { addRoutine, updateRoutine, deleteRoutine } from '@/actions/routines';
 import { cn } from '@/lib/utils';
 
+// DnD Imports
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 interface Routine {
     id: string;
     title: string;
@@ -29,6 +48,39 @@ const DAYS_SHORT: Record<string, string> = {
     'Sunday': 'Sun'
 };
 
+// Wrapper for Sortable item
+interface SortableRoutineItemProps {
+    routine: Routine;
+    disabled: boolean;
+    children: React.ReactNode;
+}
+
+function SortableRoutineItem({ routine, disabled, children }: SortableRoutineItemProps) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: routine.id, disabled });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.6 : 1,
+        zIndex: isDragging ? 10 : 1,
+        position: 'relative' as const,
+        touchAction: 'none' as const,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {children}
+        </div>
+    );
+}
+
 export default function RoutineColumnClient({ initialRoutines, isDbMissing }: RoutineColumnClientProps) {
     const [routines, setRoutines] = useState<Routine[]>(initialRoutines);
     const [loading, setLoading] = useState(false);
@@ -44,19 +96,84 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
     const [editTime, setEditTime] = useState('');
     const [editDays, setEditDays] = useState<string[]>([]);
 
-    // Load from local storage fallback if DB is missing
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    // Sync order and window resizing
     useEffect(() => {
+        setIsDesktop(window.innerWidth >= 768);
+        const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+        window.addEventListener('resize', handleResize);
+
+        // Determine the base routines list
+        let baseRoutines = initialRoutines;
         if (isDbMissing) {
             const local = localStorage.getItem('td_routines_fallback');
             if (local) {
                 try {
-                    setRoutines(JSON.parse(local));
+                    baseRoutines = JSON.parse(local);
                 } catch (e) {
                     console.error('Failed to parse local routines', e);
                 }
             }
         }
-    }, [isDbMissing]);
+
+        const savedOrder = localStorage.getItem('routine_order');
+        if (savedOrder) {
+            try {
+                const orderArray = JSON.parse(savedOrder) as string[];
+                const orderMap = new Map();
+                orderArray.forEach((id, index) => orderMap.set(id, index));
+
+                const sorted = [...baseRoutines].sort((a, b) => {
+                    const indexA = orderMap.has(a.id) ? orderMap.get(a.id) : -1;
+                    const indexB = orderMap.has(b.id) ? orderMap.get(b.id) : -1;
+                    if (indexA !== indexB) return indexA - indexB;
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime(); // fallback to newest first
+                });
+                setRoutines(sorted);
+            } catch (e) {
+                setRoutines(baseRoutines);
+            }
+        } else {
+            // Sort by newest first by default if no saved order
+            const sorted = [...baseRoutines].sort((a, b) => 
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            );
+            setRoutines(sorted);
+        }
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, [initialRoutines, isDbMissing]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 5, // 5px drag to activate
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setRoutines((items) => {
+                const oldIndex = items.findIndex(item => item.id === active.id);
+                const newIndex = items.findIndex(item => item.id === over.id);
+
+                const newArray = arrayMove(items, oldIndex, newIndex);
+                localStorage.setItem('routine_order', JSON.stringify(newArray.map(r => r.id)));
+                
+                if (isDbMissing) {
+                    localStorage.setItem('td_routines_fallback', JSON.stringify(newArray));
+                }
+                return newArray;
+            });
+        }
+    };
 
     const saveLocal = (updatedRoutines: Routine[]) => {
         setRoutines(updatedRoutines);
@@ -273,117 +390,135 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
                         No routines yet. Create one above!
                     </div>
                 ) : (
-                    routines.map((routine) => {
-                        const isEditing = editingId === routine.id;
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={routines.map(r => r.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            {routines.map((routine) => {
+                                const isEditing = editingId === routine.id;
 
-                        if (isEditing) {
-                            return (
-                                <div key={routine.id} className="p-3 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl space-y-3 shadow-md transition-all">
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            className="input text-sm flex-1 font-mono"
-                                            value={editTitle}
-                                            onChange={(e) => setEditTitle(e.target.value)}
-                                            required
-                                            disabled={loading}
-                                        />
-                                        <input
-                                            type="time"
-                                            className="input text-sm w-28 font-mono"
-                                            value={editTime}
-                                            onChange={(e) => setEditTime(e.target.value)}
-                                            required
-                                            disabled={loading}
-                                        />
-                                    </div>
+                                return (
+                                    <SortableRoutineItem
+                                        key={routine.id}
+                                        routine={routine}
+                                        disabled={isEditing || !isDesktop}
+                                    >
+                                        {isEditing ? (
+                                            <div className="p-3 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl space-y-3 shadow-md transition-all">
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        className="input text-sm flex-1 font-mono"
+                                                        value={editTitle}
+                                                        onChange={(e) => setEditTitle(e.target.value)}
+                                                        required
+                                                        disabled={loading}
+                                                    />
+                                                    <input
+                                                        type="time"
+                                                        className="input text-sm w-28 font-mono"
+                                                        value={editTime}
+                                                        onChange={(e) => setEditTime(e.target.value)}
+                                                        required
+                                                        disabled={loading}
+                                                    />
+                                                </div>
 
-                                    <div className="space-y-1">
-                                        <span className="text-[9px] font-semibold text-neutral-400 uppercase tracking-widest block">Repeat days</span>
-                                        <div className="flex justify-between gap-1">
-                                            {DAYS_OF_WEEK.map(day => {
-                                                const isSelected = editDays.includes(day);
-                                                return (
+                                                <div className="space-y-1">
+                                                    <span className="text-[9px] font-semibold text-neutral-400 uppercase tracking-widest block">Repeat days</span>
+                                                    <div className="flex justify-between gap-1">
+                                                        {DAYS_OF_WEEK.map(day => {
+                                                            const isSelected = editDays.includes(day);
+                                                            return (
+                                                                <button
+                                                                    key={day}
+                                                                    type="button"
+                                                                    onClick={() => toggleDayInEditForm(day)}
+                                                                    className={cn(
+                                                                        "w-7 h-7 rounded-full text-[10px] font-semibold flex items-center justify-center transition-all cursor-pointer",
+                                                                        isSelected 
+                                                                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900" 
+                                                                            : "border border-neutral-200 hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-800 text-neutral-400"
+                                                                    )}
+                                                                    title={day}
+                                                                    disabled={loading}
+                                                                >
+                                                                    {DAYS_SHORT[day][0]}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-end gap-2">
                                                     <button
-                                                        key={day}
                                                         type="button"
-                                                        onClick={() => toggleDayInEditForm(day)}
-                                                        className={cn(
-                                                            "w-7 h-7 rounded-full text-[10px] font-semibold flex items-center justify-center transition-all cursor-pointer",
-                                                            isSelected 
-                                                                ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900" 
-                                                                : "border border-neutral-200 hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-800 text-neutral-400"
-                                                        )}
-                                                        title={day}
+                                                        onClick={() => setEditingId(null)}
+                                                        className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-500 transition-colors"
                                                         disabled={loading}
                                                     >
-                                                        {DAYS_SHORT[day][0]}
+                                                        <X size={14} />
                                                     </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSaveEdit(routine.id)}
+                                                        disabled={loading || !editTitle.trim() || editDays.length === 0}
+                                                        className="p-1.5 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 transition-opacity flex items-center justify-center"
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="group p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800/60 rounded-xl hover:border-neutral-300 dark:hover:border-neutral-700 transition-all flex items-start justify-between shadow-sm cursor-grab active:cursor-grabbing">
+                                                <div className="space-y-1 min-w-0 flex-1 pr-3">
+                                                    <h4 className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate font-mono">
+                                                        {routine.title}
+                                                    </h4>
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 dark:text-neutral-400">
+                                                        <Clock size={10} className="text-neutral-400" />
+                                                        <span>{formatDisplayDays(routine.days)}</span>
+                                                        <span className="text-neutral-300 dark:text-neutral-700">•</span>
+                                                        <span className="font-semibold text-neutral-600 dark:text-neutral-300">{formatDisplayTime(routine.time)}</span>
+                                                    </div>
+                                                </div>
 
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setEditingId(null)}
-                                            className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-500 transition-colors"
-                                            disabled={loading}
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleSaveEdit(routine.id)}
-                                            disabled={loading || !editTitle.trim() || editDays.length === 0}
-                                            className="p-1.5 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 transition-opacity flex items-center justify-center"
-                                        >
-                                            <Check size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        return (
-                            <div
-                                key={routine.id}
-                                className="group p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800/60 rounded-xl hover:border-neutral-300 dark:hover:border-neutral-700 transition-all flex items-start justify-between shadow-sm"
-                            >
-                                <div className="space-y-1 min-w-0 flex-1 pr-3">
-                                    <h4 className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate font-mono">
-                                        {routine.title}
-                                    </h4>
-                                    <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 dark:text-neutral-400">
-                                        <Clock size={10} className="text-neutral-400" />
-                                        <span>{formatDisplayDays(routine.days)}</span>
-                                        <span className="text-neutral-300 dark:text-neutral-700">•</span>
-                                        <span className="font-semibold text-neutral-600 dark:text-neutral-300">{formatDisplayTime(routine.time)}</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={() => startEdit(routine)}
-                                        className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                                        title="Edit Routine"
-                                        disabled={loading}
-                                    >
-                                        <Edit3 size={12} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(routine.id)}
-                                        className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/30 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                                        title="Delete Routine"
-                                        disabled={loading}
-                                    >
-                                        <Trash2 size={12} />
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    })
+                                                <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            startEdit(routine);
+                                                        }}
+                                                        className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                                                        title="Edit Routine"
+                                                        disabled={loading}
+                                                    >
+                                                        <Edit3 size={12} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(routine.id);
+                                                        }}
+                                                        className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/30 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                                                        title="Delete Routine"
+                                                        disabled={loading}
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </SortableRoutineItem>
+                                );
+                            })}
+                        </SortableContext>
+                    </DndContext>
                 )}
             </div>
         </div>
