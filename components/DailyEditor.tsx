@@ -334,7 +334,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                 </div>
 
                 {/* Quick Add Note Section */}
-                <div className="border-t border-neutral-200 dark:border-neutral-800 p-2 md:p-3 bg-white dark:bg-neutral-900 shrink-0 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] dark:shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.2)] relative z-20">
+                <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 p-2 md:p-3 bg-white dark:bg-neutral-900 shrink-0 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] dark:shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.2)] relative z-20">
                     <form onSubmit={handleAddNote} className="flex gap-2">
                         <input
                             type="text"
