@@ -3,7 +3,7 @@
 import { useDashboard, DashboardProvider } from './DashboardContext';
 import { cn } from '@/lib/utils';
 import React from 'react';
-import { SidebarClose, BookOpen, Repeat } from 'lucide-react';
+import { SidebarClose, List, Repeat } from 'lucide-react';
 
 function CollapsedBar({
     label,
@@ -60,18 +60,18 @@ function DashboardGrid({
                 isJournalCollapsed ? "w-12" : "w-[25%]"
             )}>
                 {isJournalCollapsed ? (
-                    <CollapsedBar label="Journal" onClick={toggleJournal} side="left" />
+                    <CollapsedBar label="Tasks" onClick={toggleJournal} side="left" />
                 ) : (
                     <div className="h-full flex flex-col bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
                         <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-900/50 shrink-0">
                             <h2 className="text-sm font-bold bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent flex items-center gap-2">
-                                <BookOpen size={16} className="text-neutral-500" />
-                                Journal
+                                <List size={16} className="text-neutral-500" />
+                                Tasks
                             </h2>
                             <button
                                 onClick={toggleJournal}
                                 className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors"
-                                title="Collapse Journal"
+                                title="Collapse Tasks"
                             >
                                 <SidebarClose size={16} />
                             </button>
