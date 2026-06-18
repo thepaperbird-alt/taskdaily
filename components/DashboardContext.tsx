@@ -3,19 +3,23 @@
 import { createContext, useContext, useState } from 'react';
 
 type DashboardContextType = {
-    isCalendarCollapsed: boolean;
-    toggleCalendar: () => void;
+    isJournalCollapsed: boolean;
+    isRoutineCollapsed: boolean;
+    toggleJournal: () => void;
+    toggleRoutine: () => void;
 };
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const [isCalendarCollapsed, setIsCalendarCollapsed] = useState(true);
+    const [isJournalCollapsed, setIsJournalCollapsed] = useState(true);
+    const [isRoutineCollapsed, setIsRoutineCollapsed] = useState(true);
 
-    const toggleCalendar = () => setIsCalendarCollapsed(prev => !prev);
+    const toggleJournal = () => setIsJournalCollapsed(prev => !prev);
+    const toggleRoutine = () => setIsRoutineCollapsed(prev => !prev);
 
     return (
-        <DashboardContext.Provider value={{ isCalendarCollapsed, toggleCalendar }}>
+        <DashboardContext.Provider value={{ isJournalCollapsed, isRoutineCollapsed, toggleJournal, toggleRoutine }}>
             {children}
         </DashboardContext.Provider>
     );

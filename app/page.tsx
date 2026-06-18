@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import TaskList from '@/components/TaskList';
 import DailyColumn from '@/components/DailyColumn';
-import CalendarColumn from '@/components/CalendarColumn';
+import RoutineColumn from '@/components/RoutineColumn';
 import MobileNav from '@/components/MobileNav';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -38,7 +38,7 @@ export default async function Page({
             </div>
           }
           dailies={<DailyColumn dateStr={dateStr} filterTags={tagsFilter} />}
-          calendar={<CalendarColumn dateStr={dateStr} />}
+          routines={<RoutineColumn />}
         />
 
         {/* Mobile View */}

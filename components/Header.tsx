@@ -10,7 +10,7 @@ interface HeaderProps {
 
 export default function Header({ activeTab, children }: HeaderProps) {
   const navItems = [
-    { id: 'tasks', label: 'Tasks', href: '/' },
+    { id: 'tasks', label: 'Journal', href: '/' },
     { id: 'watchlist', label: 'Lists', href: '/watchlist' },
     { id: 'thoughts', label: 'Thoughts', href: '/thoughts' },
     { id: 'wallet', label: 'Wallet', href: '/wallet' },
