@@ -45,7 +45,7 @@ export default async function Page({
         <div className="md:hidden flex-1 p-0 pb-20 flex flex-col min-h-0 bg-neutral-50 dark:bg-neutral-950">
           {tab === 'tasks' && <div className="p-4 h-full"><TaskList filterTags={tagsFilter} /></div>}
           {tab === 'dailies' && <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-neutral-900"><DailyColumn dateStr={dateStr} filterTags={tagsFilter} /></div>}
-          {tab === 'hashtags' && <div className="flex-1 p-4 h-full overflow-hidden"><HashtagManager tags={allTags} /></div>}
+          {tab === 'routines' && <div className="flex-1 p-4 h-full overflow-hidden bg-white dark:bg-neutral-900"><RoutineColumn /></div>}
         </div>
       </div>
 
