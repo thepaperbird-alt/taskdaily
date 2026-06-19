@@ -120,11 +120,50 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
 
     const [isDesktop, setIsDesktop] = useState(false);
     const [today, setToday] = useState<string>('');
+    const [completedToday, setCompletedToday] = useState<string[]>([]);
+
+    const getTodayDateString = () => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const toggleRoutineCompletedToday = (id: string) => {
+        const dateStr = getTodayDateString();
+        setCompletedToday(prev => {
+            const updated = prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id];
+            localStorage.setItem(`completed_routines_${dateStr}`, JSON.stringify(updated));
+            return updated;
+        });
+    };
 
     // Sync order and window resizing
     useEffect(() => {
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         setToday(days[new Date().getDay()]);
+
+        const dateStr = getTodayDateString();
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('completed_routines_') && key !== `completed_routines_${dateStr}`) {
+                    localStorage.removeItem(key);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to clean up old keys', e);
+        }
+
+        const saved = localStorage.getItem(`completed_routines_${dateStr}`);
+        if (saved) {
+            try {
+                setCompletedToday(JSON.parse(saved));
+            } catch (e) {
+                console.error('Failed to parse completed routines', e);
+            }
+        }
 
         setIsDesktop(window.innerWidth >= 768);
         const handleResize = () => setIsDesktop(window.innerWidth >= 768);
@@ -411,6 +450,65 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
 
             {/* Routines List */}
             <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 pb-20 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
+                {/* TODAY highlight box */}
+                {today && routines.some(r => r.days.includes(today)) && (
+                    <div className="bg-yellow-500/5 dark:bg-yellow-500/10 border-2 border-yellow-200/50 dark:border-yellow-900/30 rounded-2xl p-4 relative overflow-hidden shadow-sm mb-4">
+                        <div className="flex items-center justify-between mb-3 border-b border-yellow-200/40 dark:border-yellow-900/20 pb-2">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                                <h3 className="text-xs font-bold text-yellow-800 dark:text-yellow-400 uppercase tracking-wider font-mono">Today's Routines</h3>
+                            </div>
+                            <span className="text-[10px] font-semibold font-mono text-yellow-700 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-950/50 px-2 py-0.5 rounded-full flex items-center gap-1.5">
+                                <span>{today}</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-yellow-400/50" />
+                                <span>
+                                    {routines.filter(r => r.days.includes(today) && completedToday.includes(r.id)).length}/
+                                    {routines.filter(r => r.days.includes(today)).length}
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div className="space-y-1">
+                            {routines
+                                .filter(r => r.days.includes(today))
+                                .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+                                .map(routine => {
+                                    const isCompletedToday = completedToday.includes(routine.id);
+                                    return (
+                                        <div key={`today-${routine.id}`} className="flex items-center gap-3 py-2 border-b border-yellow-100/30 dark:border-yellow-950/10 last:border-0 animate-fade-in">
+                                            <button
+                                                onClick={() => toggleRoutineCompletedToday(routine.id)}
+                                                className={cn(
+                                                    "w-4 h-4 rounded border flex items-center justify-center transition-all cursor-pointer shrink-0",
+                                                    isCompletedToday
+                                                        ? "bg-yellow-500 border-yellow-500 text-white dark:bg-yellow-500 dark:border-yellow-500"
+                                                        : "border-yellow-300 dark:border-yellow-700 hover:border-yellow-500 dark:hover:border-yellow-500 text-transparent"
+                                                )}
+                                            >
+                                                <Check size={10} className="stroke-[3]" />
+                                            </button>
+                                            <div className="min-w-0 flex-1">
+                                                <p className={cn(
+                                                    "text-xs font-mono truncate transition-all",
+                                                    isCompletedToday
+                                                        ? "text-neutral-400 dark:text-neutral-600 line-through"
+                                                        : "text-neutral-800 dark:text-neutral-200 font-semibold"
+                                                )}>
+                                                    {routine.title}
+                                                </p>
+                                                <p className="text-[9px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1 mt-0.5">
+                                                    <Clock size={8} />
+                                                    <span>{formatDisplayTime(routine.time)}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            }
+                        </div>
+                    </div>
+                )}
+
                 {displayedRoutines.length === 0 ? (
                     <div className="text-center text-neutral-400 mt-10 text-xs">
                         No routines yet. Create one above!
