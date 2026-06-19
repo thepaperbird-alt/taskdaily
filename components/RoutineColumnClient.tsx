@@ -525,7 +525,6 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
                         >
                             {displayedRoutines.map((routine) => {
                                 const isEditing = editingId === routine.id;
-                                const isToday = today && routine.days.includes(today);
 
                                 return (
                                     <SortableRoutineItem
@@ -600,12 +599,7 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className={cn(
-                                                "group p-3 border rounded-xl transition-all flex items-start justify-between shadow-sm cursor-grab active:cursor-grabbing",
-                                                isToday
-                                                    ? "bg-yellow-50/70 dark:bg-yellow-950/20 border-yellow-200/80 dark:border-yellow-900/40 hover:border-yellow-300 dark:hover:border-yellow-800/60"
-                                                    : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800/60 hover:border-neutral-300 dark:hover:border-neutral-700"
-                                            )}>
+                                            <div className="group p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800/60 rounded-xl hover:border-neutral-300 dark:hover:border-neutral-700 transition-all flex items-start justify-between shadow-sm cursor-grab active:cursor-grabbing">
                                                 <div className="space-y-1 min-w-0 flex-1 pr-3">
                                                     <h4 className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate font-mono">
                                                         {routine.title}
