@@ -81,6 +81,28 @@ function SortableRoutineItem({ routine, disabled, children }: SortableRoutineIte
     );
 }
 
+const getEarliestDayIndex = (days: string[]) => {
+    if (!days || days.length === 0) return 999;
+    let minIndex = 999;
+    days.forEach(day => {
+        const idx = DAYS_OF_WEEK.indexOf(day);
+        if (idx !== -1 && idx < minIndex) {
+            minIndex = idx;
+        }
+    });
+    return minIndex;
+};
+
+const sortRoutinesByDay = (list: Routine[]): Routine[] => {
+    return [...list].sort((a, b) => {
+        const dayA = getEarliestDayIndex(a.days);
+        const dayB = getEarliestDayIndex(b.days);
+        if (dayA !== dayB) return dayA - dayB;
+        // Secondary sort by time
+        return (a.time || '').localeCompare(b.time || '');
+    });
+};
+
 export default function RoutineColumnClient({ initialRoutines, isDbMissing }: RoutineColumnClientProps) {
     const [routines, setRoutines] = useState<Routine[]>(initialRoutines);
     const [loading, setLoading] = useState(false);
@@ -135,10 +157,8 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
                 setRoutines(baseRoutines);
             }
         } else {
-            // Sort by newest first by default if no saved order
-            const sorted = [...baseRoutines].sort((a, b) => 
-                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
+            // Sort by day of week by default if no saved order
+            const sorted = sortRoutinesByDay(baseRoutines);
             setRoutines(sorted);
         }
 
@@ -313,6 +333,8 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
         return ordered.map(d => DAYS_SHORT[d]).join(', ');
     };
 
+    const displayedRoutines = isDesktop ? routines : sortRoutinesByDay(routines);
+
     return (
         <div className="h-full flex flex-col">
             {/* Fallback Warning Banner */}
@@ -385,7 +407,7 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
 
             {/* Routines List */}
             <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 pb-20 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
-                {routines.length === 0 ? (
+                {displayedRoutines.length === 0 ? (
                     <div className="text-center text-neutral-400 mt-10 text-xs">
                         No routines yet. Create one above!
                     </div>
@@ -396,10 +418,10 @@ export default function RoutineColumnClient({ initialRoutines, isDbMissing }: Ro
                         onDragEnd={handleDragEnd}
                     >
                         <SortableContext
-                            items={routines.map(r => r.id)}
+                            items={displayedRoutines.map(r => r.id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            {routines.map((routine) => {
+                            {displayedRoutines.map((routine) => {
                                 const isEditing = editingId === routine.id;
 
                                 return (
