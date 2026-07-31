@@ -50,6 +50,27 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
     setItems(initialMedia);
   }, [initialMedia]);
 
+  useEffect(() => {
+    const savedTab = localStorage.getItem('watchlist_active_tab');
+    if (savedTab && ['to_watch', 'current', 'completed'].includes(savedTab)) {
+      setActiveTab(savedTab as any);
+    }
+    const savedType = localStorage.getItem('watchlist_type_filter');
+    if (savedType && ['all', 'movie', 'tv', 'game', 'gadget', 'travel'].includes(savedType)) {
+      setTypeFilter(savedType as any);
+    }
+  }, []);
+
+  const handleTabChange = (tab: 'to_watch' | 'current' | 'completed') => {
+    setActiveTab(tab);
+    localStorage.setItem('watchlist_active_tab', tab);
+  };
+
+  const handleTypeChange = (type: 'all' | 'movie' | 'tv' | 'game' | 'gadget' | 'travel') => {
+    setTypeFilter(type);
+    localStorage.setItem('watchlist_type_filter', type);
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -221,7 +242,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                {COLUMNS.map(col => (
                    <button 
                     key={col.id}
-                    onClick={() => setActiveTab(col.id as any)}
+                    onClick={() => handleTabChange(col.id as any)}
                     className={cn(
                         "flex-1 py-1.5 text-xs font-semibold rounded-md transition-all touch-manipulation",
                         activeTab === col.id ? "bg-white text-black shadow-sm" : "text-neutral-500"
@@ -233,12 +254,12 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
             </div>
 
             <div className="hidden md:flex gap-2">
-                 <button onClick={() => setTypeFilter('all')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors", typeFilter === 'all' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}>All</button>
-                 <button onClick={() => setTypeFilter('movie')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'movie' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Film size={14}/> Movies</button>
-                 <button onClick={() => setTypeFilter('tv')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'tv' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Tv size={14}/> Shows</button>
-                 <button onClick={() => setTypeFilter('game')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'game' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Gamepad2 size={14}/> Games</button>
-                 <button onClick={() => setTypeFilter('gadget')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'gadget' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><ShoppingBag size={14}/> Gadgets</button>
-                 <button onClick={() => setTypeFilter('travel')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'travel' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Plane size={14}/> Travel</button>
+                 <button onClick={() => handleTypeChange('all')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors", typeFilter === 'all' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}>All</button>
+                 <button onClick={() => handleTypeChange('movie')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'movie' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Film size={14}/> Movies</button>
+                 <button onClick={() => handleTypeChange('tv')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'tv' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Tv size={14}/> Shows</button>
+                 <button onClick={() => handleTypeChange('game')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'game' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Gamepad2 size={14}/> Games</button>
+                 <button onClick={() => handleTypeChange('gadget')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'gadget' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><ShoppingBag size={14}/> Gadgets</button>
+                 <button onClick={() => handleTypeChange('travel')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'travel' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Plane size={14}/> Travel</button>
             </div>
         </div>
 
