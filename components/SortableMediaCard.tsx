@@ -23,12 +23,12 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onDelete, o
   const Icon = item.type === 'movie' ? Film : item.type === 'game' ? Gamepad2 : item.type === 'gadget' ? ShoppingBag : item.type === 'travel' ? Plane : item.type === 'book' ? Book : Tv;
   
   const bgColors: Record<string, string> = {
-      'movie': 'border-l-pink-400 bg-pink-50/50',
-      'tv': 'border-l-yellow-400 bg-yellow-50/50',
-      'game': 'border-l-purple-400 bg-purple-50/50',
-      'gadget': 'border-l-teal-400 bg-teal-50/50',
-      'travel': 'border-l-sky-400 bg-sky-50/50',
-      'book': 'border-l-orange-400 bg-orange-50/50'
+      'movie': 'border-l-pink-400 bg-pink-50/50 dark:bg-pink-950/20',
+      'tv': 'border-l-yellow-400 bg-yellow-50/50 dark:bg-yellow-950/20',
+      'game': 'border-l-purple-400 bg-purple-50/50 dark:bg-purple-950/20',
+      'gadget': 'border-l-teal-400 bg-teal-50/50 dark:bg-teal-950/20',
+      'travel': 'border-l-sky-400 bg-sky-50/50 dark:bg-sky-950/20',
+      'book': 'border-l-orange-400 bg-orange-50/50 dark:bg-orange-950/20'
   };
 
   return (
@@ -36,14 +36,14 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onDelete, o
       ref={setNodeRef}
       style={style}
       className={cn(
-        "relative rounded-xl border-2 border-dashed border-neutral-300 bg-white p-2.5 flex gap-2 group transition-all font-mono",
-        isDragging && !isOverlay ? "opacity-30 border-neutral-400" : "opacity-100",
+        "relative rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-800 bg-white dark:bg-black p-2.5 flex gap-2 group transition-all font-mono",
+        isDragging && !isOverlay ? "opacity-30 border-neutral-400 dark:border-neutral-700" : "opacity-100",
         isOverlay ? "shadow-xl border-solid border-neutral-500 scale-105 z-50 cursor-grabbing" : "shadow-sm"
       )}
     >
         {/* Drag Handle */}
         <div 
-            className="flex items-center justify-center cursor-grab active:cursor-grabbing text-neutral-300 hover:text-neutral-500 transition-colors"
+            className="flex items-center justify-center cursor-grab active:cursor-grabbing text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 dark:hover:text-neutral-400 transition-colors"
             {...attributes}
             {...listeners}
         >
@@ -58,36 +58,36 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onDelete, o
             )}
         >
             <div className="flex items-start justify-between gap-2 pr-6">
-                <h3 className="font-bold text-xs text-neutral-900 leading-tight flex-1 tracking-tight">{item.title}</h3>
-                <Icon size={12} className="text-neutral-500 shrink-0 mt-0.5" />
+                <h3 className="font-bold text-xs text-neutral-900 dark:text-white leading-tight flex-1 tracking-tight">{item.title}</h3>
+                <Icon size={12} className="text-neutral-500 dark:text-neutral-400 shrink-0 mt-0.5" />
             </div>
             
             {item.summary && (
-                <p className="text-[10px] text-neutral-600 line-clamp-2 leading-relaxed mt-0.5 max-w-[90%]">
+                <p className="text-[10px] text-neutral-600 dark:text-neutral-400 line-clamp-2 leading-relaxed mt-0.5 max-w-[90%]">
                     {item.summary}
                 </p>
             )}
 
             <div className="flex flex-wrap gap-1.5 mt-1.5 items-center">
                 {item.platform && (
-                    <span className="text-[9px] uppercase font-bold tracking-wider bg-white/80 text-neutral-800 px-1 py-0.5 rounded shadow-sm border border-neutral-200">
+                    <span className="text-[9px] uppercase font-bold tracking-wider bg-white/80 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 px-1 py-0.5 rounded shadow-sm border border-neutral-200 dark:border-neutral-800">
                         {item.platform}
                     </span>
                 )}
                 {item.type === 'tv' && item.season && (
-                    <span className="text-[9px] uppercase font-bold tracking-wider text-neutral-600 bg-white/80 border border-neutral-200 px-1 py-0.5 rounded">
+                    <span className="text-[9px] uppercase font-bold tracking-wider text-neutral-600 dark:text-neutral-400 bg-white/80 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 px-1 py-0.5 rounded">
                         {item.season}
                     </span>
                 )}
                 {item.medium && (
-                    <span className="text-[9px] uppercase font-bold tracking-wider text-neutral-600 bg-white/80 border border-neutral-200 px-1 py-0.5 rounded">
+                    <span className="text-[9px] uppercase font-bold tracking-wider text-neutral-600 dark:text-neutral-400 bg-white/80 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 px-1 py-0.5 rounded">
                         {item.medium}
                     </span>
                 )}
                 <div className="ml-auto md:hidden flex items-center gap-1">
                     {onMoveLeft && (
                         <button 
-                            className="text-[9px] uppercase font-bold tracking-wider bg-black text-white px-2 py-1 rounded shadow-sm border border-neutral-800 flex items-center gap-1 active:scale-95 transition-transform"
+                            className="text-[9px] uppercase font-bold tracking-wider bg-black dark:bg-neutral-800 text-white px-2 py-1 rounded shadow-sm border border-neutral-800 dark:border-neutral-700 flex items-center gap-1 active:scale-95 transition-transform"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -99,7 +99,7 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onDelete, o
                     )}
                     {onMoveRight && (
                         <button 
-                            className="text-[9px] uppercase font-bold tracking-wider bg-black text-white px-2 py-1 rounded shadow-sm border border-neutral-800 flex items-center gap-1 active:scale-95 transition-transform"
+                            className="text-[9px] uppercase font-bold tracking-wider bg-black dark:bg-neutral-800 text-white px-2 py-1 rounded shadow-sm border border-neutral-800 dark:border-neutral-700 flex items-center gap-1 active:scale-95 transition-transform"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -126,7 +126,7 @@ export function SortableMediaCard({ item, isOverlay = false, onEdit, onDelete, o
                     <Trash2 size={12} />
                 </button>
                 <button 
-                    className="p-1 text-neutral-400 hover:text-black hover:bg-white/50 rounded transition-colors"
+                    className="p-1 text-neutral-400 hover:text-black dark:hover:text-white hover:bg-white/50 dark:hover:bg-neutral-800 rounded transition-colors"
                     onClick={(e) => {
                         e.stopPropagation();
                         onEdit?.();

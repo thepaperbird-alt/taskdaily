@@ -27,9 +27,9 @@ import { SortableMediaCard } from './SortableMediaCard';
 import AddMediaModal from './AddMediaModal';
 
 const COLUMNS = [
-  { id: 'to_watch', title: 'Waiting', color: 'bg-pink-100/50', border: 'border-pink-200' },
-  { id: 'current', title: 'Current', color: 'bg-yellow-100/50', border: 'border-yellow-200' },
-  { id: 'completed', title: 'Done', color: 'bg-green-100/50', border: 'border-green-200' }
+  { id: 'to_watch', title: 'Waiting', color: 'bg-pink-100/50 dark:bg-pink-950/10', border: 'border-pink-200 dark:border-pink-900/30' },
+  { id: 'current', title: 'Current', color: 'bg-yellow-100/50 dark:bg-yellow-950/10', border: 'border-yellow-200 dark:border-yellow-900/30' },
+  { id: 'completed', title: 'Done', color: 'bg-green-100/50 dark:bg-green-950/10', border: 'border-green-200 dark:border-green-900/30' }
 ];
 
 function DroppableColumn({ id, children, className }: { id: string, children: React.ReactNode, className: string }) {
@@ -238,14 +238,16 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
         {/* Filters & Header */}
         <div className="flex items-center justify-between mb-4 md:mb-6 shrink-0">
             {/* Mobile Tab Nav within Watchlist */}
-            <div className="flex md:hidden bg-neutral-200/50 p-1 rounded-lg w-full max-w-sm mx-auto">
+            <div className="flex md:hidden bg-neutral-200/50 dark:bg-neutral-800/50 p-1 rounded-lg w-full max-w-sm mx-auto">
                {COLUMNS.map(col => (
                    <button 
                     key={col.id}
                     onClick={() => handleTabChange(col.id as any)}
                     className={cn(
                         "flex-1 py-1.5 text-xs font-semibold rounded-md transition-all touch-manipulation",
-                        activeTab === col.id ? "bg-white text-black shadow-sm" : "text-neutral-500"
+                        activeTab === col.id 
+                            ? "bg-white dark:bg-neutral-900 text-black dark:text-white shadow-sm" 
+                            : "text-neutral-500 dark:text-neutral-400"
                     )}
                    >
                     {col.title}
@@ -254,13 +256,13 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
             </div>
 
             <div className="hidden md:flex gap-2">
-                 <button onClick={() => handleTypeChange('all')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors", typeFilter === 'all' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}>All</button>
-                 <button onClick={() => handleTypeChange('movie')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'movie' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Film size={14}/> Movies</button>
-                 <button onClick={() => handleTypeChange('tv')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'tv' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Tv size={14}/> Shows</button>
-                 <button onClick={() => handleTypeChange('game')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'game' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Gamepad2 size={14}/> Games</button>
-                 <button onClick={() => handleTypeChange('book')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'book' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Book size={14}/> Books</button>
-                 <button onClick={() => handleTypeChange('gadget')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'gadget' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><ShoppingBag size={14}/> Gadgets</button>
-                 <button onClick={() => handleTypeChange('travel')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'travel' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Plane size={14}/> Travel</button>
+                 <button onClick={() => handleTypeChange('all')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors border", typeFilter === 'all' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}>All</button>
+                 <button onClick={() => handleTypeChange('movie')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 border", typeFilter === 'movie' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}><Film size={14}/> Movies</button>
+                 <button onClick={() => handleTypeChange('tv')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 border", typeFilter === 'tv' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}><Tv size={14}/> Shows</button>
+                 <button onClick={() => handleTypeChange('game')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 border", typeFilter === 'game' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}><Gamepad2 size={14}/> Games</button>
+                 <button onClick={() => handleTypeChange('book')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 border", typeFilter === 'book' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}><Book size={14}/> Books</button>
+                 <button onClick={() => handleTypeChange('gadget')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 border", typeFilter === 'gadget' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}><ShoppingBag size={14}/> Gadgets</button>
+                 <button onClick={() => handleTypeChange('travel')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 border", typeFilter === 'travel' ? "bg-black dark:bg-white text-white dark:text-black border-transparent" : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800")}><Plane size={14}/> Travel</button>
             </div>
         </div>
 
@@ -289,10 +291,10 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                             )}
                         >
                             <div className={cn("p-4 md:p-5 border-b-2 border-dashed flex items-center justify-between shrink-0", col.border)}>
-                                <h2 className="text-sm md:text-base font-bold text-neutral-800">{col.title} <span className="text-neutral-400 font-normal ml-1">({colItems.length})</span></h2>
+                                <h2 className="text-sm md:text-base font-bold text-neutral-800 dark:text-neutral-100">{col.title} <span className="text-neutral-400 font-normal ml-1">({colItems.length})</span></h2>
                                 <button 
                                     onClick={() => openAddModal(col.id as any)}
-                                    className="p-1.5 rounded-full hover:bg-white/50 bg-white/30 text-neutral-700 transition-colors"
+                                    className="p-1.5 rounded-full hover:bg-white/50 dark:hover:bg-neutral-800 bg-white/30 dark:bg-neutral-800/30 text-neutral-700 dark:text-neutral-300 transition-colors"
                                 >
                                     <Plus size={16} strokeWidth={3} />
                                 </button>
@@ -310,7 +312,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                                         />
                                     ))}
                                     {colItems.length === 0 && (
-                                        <div className="h-24 rounded-xl border-2 border-dashed border-neutral-200 flex items-center justify-center text-xs text-neutral-400 italic">
+                                        <div className="h-24 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-xs text-neutral-400 dark:text-neutral-500 italic">
                                             Drop items here
                                         </div>
                                     )}
