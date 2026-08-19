@@ -40,7 +40,7 @@ function DroppableColumn({ id, children, className }: { id: string, children: Re
 export default function WatchlistClient({ initialMedia }: { initialMedia: MediaItem[] }) {
   const [items, setItems] = useState<MediaItem[]>(initialMedia);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'to_watch' | 'current' | 'completed'>('to_watch');
+  const [activeTab, setActiveTab] = useState<'to_watch' | 'current' | 'completed'>('current');
   const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'tv' | 'game' | 'gadget' | 'travel' | 'book'>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addStatus, setAddStatus] = useState<'to_watch' | 'current' | 'completed'>('to_watch');
