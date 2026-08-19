@@ -52,7 +52,7 @@ export default function TaskItem({ task }: { task: Task }) {
 
     return (
         <div
-            className="flex items-center gap-2 px-2 py-1.5 border border-black/5 rounded group shadow-sm transition-all hover:shadow-md"
+            className="flex items-center gap-2 px-2 py-1.5 border border-black/5 dark:border-white/10 rounded group shadow-sm transition-all hover:shadow-md"
             style={{ backgroundColor: bgColor }}
         >
             <button
@@ -60,8 +60,8 @@ export default function TaskItem({ task }: { task: Task }) {
                 className={cn(
                     "w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0",
                     completed
-                        ? "bg-black border-black text-white"
-                        : "border-black/20 hover:border-black/40 bg-white/50"
+                        ? "bg-black border-black dark:bg-white dark:border-white text-white dark:text-black"
+                        : "border-black/20 dark:border-white/20 hover:border-black/40 dark:hover:border-white/40 bg-white/50 dark:bg-neutral-800/50"
                 )}
             >
                 {completed && <Check size={10} strokeWidth={3} />}
@@ -69,7 +69,7 @@ export default function TaskItem({ task }: { task: Task }) {
 
             <div className="flex-1 min-w-0 overflow-hidden">
                 <div className={cn(
-                    "text-xs transition-all truncate font-medium text-neutral-900",
+                    "text-xs transition-all truncate font-medium text-neutral-900 dark:text-neutral-100",
                     completed && "text-neutral-500 line-through opacity-60"
                 )}>
                     <HashtagText text={task.title} />

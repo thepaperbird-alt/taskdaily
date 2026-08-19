@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import ClockWidget from './ClockWidget';
 import CalendarWidget from './CalendarWidget';
+import DarkModeSwitch from './DarkModeSwitch';
 
 interface HeaderProps {
   activeTab: 'tasks' | 'watchlist' | 'thoughts' | 'wallet';
@@ -40,6 +41,7 @@ export default function Header({ activeTab, children }: HeaderProps) {
         ))}
       </div>
       <div className="flex items-center gap-2 md:gap-4">
+        <DarkModeSwitch />
         <CalendarWidget />
         {children || <ClockWidget />}
       </div>
