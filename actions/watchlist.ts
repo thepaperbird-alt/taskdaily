@@ -13,10 +13,11 @@ export type MediaItem = {
     user_id: string;
     title: string;
     summary: string | null;
-    type: 'movie' | 'tv' | 'game' | 'gadget' | 'travel';
+    type: 'movie' | 'tv' | 'game' | 'gadget' | 'travel' | 'book';
     status: 'to_watch' | 'current' | 'completed';
     platform: string | null;
     season: string | null;
+    medium: string | null;
     order_index: number;
     created_at: string;
     updated_at: string;
@@ -40,10 +41,11 @@ export async function getWatchlist() {
 export async function addMediaItem(data: {
     title: string;
     summary?: string;
-    type: 'movie' | 'tv' | 'game' | 'gadget' | 'travel';
+    type: 'movie' | 'tv' | 'game' | 'gadget' | 'travel' | 'book';
     status: 'to_watch' | 'current' | 'completed';
     platform?: string;
     season?: string;
+    medium?: string | null;
 }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -86,6 +88,7 @@ export async function addMediaItem(data: {
             status: data.status,
             platform: data.platform,
             season: data.season,
+            medium: data.medium,
             order_index: nextOrder
         });
 

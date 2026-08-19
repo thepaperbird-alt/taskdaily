@@ -4,10 +4,11 @@ CREATE TABLE td_media (
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     title TEXT NOT NULL,
     summary TEXT,
-    type TEXT CHECK (type IN ('movie', 'tv', 'game', 'gadget', 'travel')) NOT NULL DEFAULT 'movie',
+    type TEXT CHECK (type IN ('movie', 'tv', 'game', 'gadget', 'travel', 'book')) NOT NULL DEFAULT 'movie',
     status TEXT CHECK (status IN ('to_watch', 'current', 'completed')) NOT NULL DEFAULT 'to_watch',
     platform TEXT,
     season TEXT,
+    medium TEXT,
     order_index INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

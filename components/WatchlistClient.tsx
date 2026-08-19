@@ -21,7 +21,7 @@ import {
 } from '@dnd-kit/sortable';
 import { MediaItem, updateMediaOrder, updateMediaItem, deleteMediaItem } from '@/actions/watchlist';
 import { cn } from '@/lib/utils';
-import { Plus, Tv, Film, MoreVertical, Edit2, Gamepad2, ShoppingBag, Plane } from 'lucide-react';
+import { Plus, Tv, Film, MoreVertical, Edit2, Gamepad2, ShoppingBag, Plane, Book } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableMediaCard } from './SortableMediaCard';
 import AddMediaModal from './AddMediaModal';
@@ -41,7 +41,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
   const [items, setItems] = useState<MediaItem[]>(initialMedia);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'to_watch' | 'current' | 'completed'>('to_watch');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'tv' | 'game' | 'gadget' | 'travel'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'tv' | 'game' | 'gadget' | 'travel' | 'book'>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addStatus, setAddStatus] = useState<'to_watch' | 'current' | 'completed'>('to_watch');
   const [editItem, setEditItem] = useState<MediaItem | null>(null);
@@ -56,7 +56,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
       setActiveTab(savedTab as any);
     }
     const savedType = localStorage.getItem('watchlist_type_filter');
-    if (savedType && ['all', 'movie', 'tv', 'game', 'gadget', 'travel'].includes(savedType)) {
+    if (savedType && ['all', 'movie', 'tv', 'game', 'gadget', 'travel', 'book'].includes(savedType)) {
       setTypeFilter(savedType as any);
     }
   }, []);
@@ -66,7 +66,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
     localStorage.setItem('watchlist_active_tab', tab);
   };
 
-  const handleTypeChange = (type: 'all' | 'movie' | 'tv' | 'game' | 'gadget' | 'travel') => {
+  const handleTypeChange = (type: 'all' | 'movie' | 'tv' | 'game' | 'gadget' | 'travel' | 'book') => {
     setTypeFilter(type);
     localStorage.setItem('watchlist_type_filter', type);
   };
@@ -258,6 +258,7 @@ export default function WatchlistClient({ initialMedia }: { initialMedia: MediaI
                  <button onClick={() => handleTypeChange('movie')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'movie' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Film size={14}/> Movies</button>
                  <button onClick={() => handleTypeChange('tv')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'tv' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Tv size={14}/> Shows</button>
                  <button onClick={() => handleTypeChange('game')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'game' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Gamepad2 size={14}/> Games</button>
+                 <button onClick={() => handleTypeChange('book')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'book' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Book size={14}/> Books</button>
                  <button onClick={() => handleTypeChange('gadget')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'gadget' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><ShoppingBag size={14}/> Gadgets</button>
                  <button onClick={() => handleTypeChange('travel')} className={cn("px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1", typeFilter === 'travel' ? "bg-black text-white" : "bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50")}><Plane size={14}/> Travel</button>
             </div>
