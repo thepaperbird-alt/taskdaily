@@ -220,7 +220,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
     return (
         <div className="flex flex-col h-full bg-white dark:bg-neutral-900 md:rounded-xl md:shadow-sm border-t md:border border-neutral-200 dark:border-neutral-800 overflow-hidden">
             {/* Tabs */}
-            <div className="flex p-1 md:p-1.5 m-2 md:m-3 bg-neutral-100 dark:bg-neutral-800/50 rounded-lg shrink-0 gap-1">
+            <div className="hidden md:flex p-1 md:p-1.5 m-2 md:m-3 bg-neutral-100 dark:bg-neutral-800/50 rounded-lg shrink-0 gap-1">
                 <button
                     onClick={() => setActiveTab('daily')}
                     className={cn(
@@ -248,7 +248,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
             {activeTab === 'daily' ? (
                 <>
                     {/* Header / Toolbar */}
-                    <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 gap-2 shrink-0">
+                    <div className="hidden md:flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 gap-2 shrink-0">
                 <div className="flex items-center gap-2 md:gap-4 shrink min-w-0">
                     <div className="flex items-center shrink-0 bg-white dark:bg-neutral-800 rounded-lg p-0.5 border border-neutral-200 dark:border-neutral-700 shadow-sm">
                         <Link href={`/?date=${prevDay}`} className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors">
@@ -296,7 +296,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
             </div>
 
             <div className="flex-1 flex flex-col relative overflow-hidden bg-neutral-50/20 min-h-0">
-                <div className="flex-1 relative overflow-hidden min-h-0">
+                <div className="hidden md:block flex-1 relative overflow-hidden min-h-0">
                     {/* Overlay for coloring */}
                     <div
                         id="editor-overlay"
@@ -354,7 +354,7 @@ export default function DailyEditor({ daily, date, allTags }: { daily?: Daily; d
                 </div>
 
                 {/* Mobile Preview of Notes (only visible on mobile, pulls text from editor) */}
-                <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-4 shrink-0 overflow-y-auto max-h-[40vh]">
+                <div className="md:hidden flex-1 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-4 overflow-y-auto">
                     <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">Today's Notes</h3>
                     {content.trim() ? (
                         <div className="space-y-2">
