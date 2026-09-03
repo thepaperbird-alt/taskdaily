@@ -21,7 +21,8 @@ export default function Header({ activeTab, children }: HeaderProps) {
     <header className="h-auto min-h-[5rem] md:min-h-[7rem] py-2 px-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between shrink-0">
       <div className="flex items-center gap-2">
         <Link href="/">
-          <img src="/logo.png" alt="TaskDaily Logo" className="h-24 md:h-32 w-auto object-contain cursor-pointer" />
+          <img src="/logo.png" alt="TaskDaily Logo" className="h-24 md:h-32 w-auto object-contain cursor-pointer dark:hidden" />
+          <img src="/logo-dark.png" alt="TaskDaily Logo" className="h-24 md:h-32 w-auto object-contain cursor-pointer hidden dark:block" />
         </Link>
       </div>
       <div className="hidden md:flex items-center gap-6">
